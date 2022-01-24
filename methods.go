@@ -548,12 +548,6 @@ func UseType(objType uint16, color uint16) <-chan uint32 {
 	return p.out
 }
 
-/*
-_use_from_ground = _ScriptMethod(103)  # UseFromGround
-_use_from_ground.restype = _uint
-_use_from_ground.argtypes = [_ushort,  # ObjType
-                             _ushort]  # Color
-*/
 func UseFromGround(objType, color uint16) <-chan uint32 {
 	p := NewUint32Packet(SCUseFromGround, objType, color)
 	p.send(senderFunc)
@@ -666,79 +660,88 @@ func LastJournalMessage() <-chan string {
 	return p.out
 }
 
-/*
-_get_journal_line_index = _ScriptMethod(121)  # InJournal
-_get_journal_line_index.restype = _int
-_get_journal_line_index.argtypes = [_str]  # Str
-*/
 func InJournal(s string) <-chan int32 {
 	p := NewIntPacket(SCInJournal, s)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
-_get_journal_line_index_time = _ScriptMethod(122)  # InJournalBetweenTimes
-_get_journal_line_index_time.restype = _int
-_get_journal_line_index_time.argtypes = [_str,  # Str
-                                         _double,  # TimeBegin
-                                         _double]  # TimeEnd
-func InJournalBetweenTimes(Str, TimeBegin, TimeEnd){
-    p :=
-p.send(senderFunc)
-// return _get_journal_line_index_time(Str, _pdt2ddt(TimeBegin),
+// InJournalBetweenTimes
+//
+// RU: Поиск последней строки в журнале по слову (или по словам) во временном интервале.
+// Если строка не найдена возвратит -1, если найдена,
+// возвратит индекс строки в журнале начиная с 0.
+//
+// EN: Search for last entry in journal by word(words) in time interval
+// Returns if string is found - index of string starting from 0
+// if string is not found -1
+func InJournalBetweenTimes(str string, timeBegin time.Time, timeEnd time.Time) <-chan int32 {
+	p := NewIntPacket(SCInJournalBetweenTimes, str, timeBegin, timeEnd)
+	p.send(senderFunc)
+	return p.out
 }
-                                        _pdt2ddt(TimeEnd))
-_get_journal_line = _ScriptMethod(123)  # Journal
-_get_journal_line.restype = _str
-_get_journal_line.argtypes = [_uint]  # StringIndex
-func Journal(StringIndex){
-    p :=
-p.send(senderFunc)
-// return _get_journal_line(StringIndex)
+
+func Journal(stringIndex uint32) <-chan string {
+	p := NewStringPacket(SCJournal, stringIndex)
+	p.send(senderFunc)
+	return p.out
 }
-_set_journal_line = _ScriptMethod(124)  # SetJournalLine
-_set_journal_line.argtypes = [_uint,  # StringIndex
-                              _str]  # Text
-func SetJournalLine(StringIndex, Text){
-    _set_journal_line(StringIndex, Text)
+
+func SetJournalLine(stringIndex uint32, text string) {
+	p := NewVoidPacket(SCSetJournalLine, stringIndex, text)
+	p.send(senderFunc)
 }
-*/
+
 func LowJournal() <-chan uint32 {
 	p := NewUint32Packet(125)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
- */
 func HighJournal() <-chan uint32 {
 	p := NewUint32Packet(126)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
-func WaitJournalLine(StartTime, Str, MaxWaitTimeMS=0){
-    time = {'milliseconds': MaxWaitTimeMS} if MaxWaitTimeMS else {'weeks': 999}
+func waitJournalLineType(startTime time.Time, str string, maxWaitTime time.Duration, t string) <-chan bool {
+	if maxWaitTime == 0 {
+		maxWaitTime = time.Duration(time.Hour * 24)
+	}
+
+	stop := time.Now().Add(maxWaitTime)
+	r := make(chan bool)
+	defer close(r)
+	go func() {
+		for {
+			if time.Now().After(stop) {
+				r <- false
+				break
+			}
+
+			if <-InJournalBetweenTimes(str, startTime, time.Now()) >= 0 {
+				if t != "" && <-LineName() == "System" {
+					r <- true
+					break
+				} else if t == "normal" {
+					r <- true
+				}
+			}
+			time.Sleep(time.Millisecond * 50)
+		}
+	}()
+
+	return r
 }
-    stop = StartTime + _datetime.timedelta(**time)
-    while _datetime.datetime.now() <= stop:
-        if InJournalBetweenTimes(Str, StartTime, stop) >= 0:
-            return True
-        Wait(10)
-    return False
-func WaitJournalLineSystem(StartTime, Str, MaxWaitTimeMS=0){
-    time = {'milliseconds': MaxWaitTimeMS} if MaxWaitTimeMS else {'weeks': 999}
+
+func WaitJournalLine(startTime time.Time, str string, maxWaitTime time.Duration) <-chan bool {
+	return waitJournalLineType(startTime, str, maxWaitTime, "normal")
 }
-    stop = StartTime + _datetime.timedelta(**time)
-    while _datetime.datetime.now() <= stop:
-        if InJournalBetweenTimes(Str, StartTime, stop) >= 0:
-            if LineName() == 'System':
-                return True
-        Wait(10)
-    return False
-*/
+
+func WaitJournalLineSystem(startTime time.Time, str string, maxWaitTime time.Duration) <-chan bool {
+	return waitJournalLineType(startTime, str, maxWaitTime, "System")
+}
+
 func SetFindDistance(Value uint32) {
 	p := NewVoidPacket(127, Value)
 	p.send(senderFunc)
@@ -761,34 +764,17 @@ func GetFindVertical() <-chan uint32 {
 	return p.out
 }
 
-/*
-_set_search_at_null = _ScriptMethod(336)  # SetFindInNulPoint
-_set_search_at_null.argtypes = [_bool]  # Value
-func SetFindInNulPoint(Value){
-    _set_search_at_null(Value)
+func SetFindInNulPoint(v bool) {
+	p := NewVoidPacket(SCSetFindInNulPoint, v)
+	p.send(senderFunc)
 }
-*/
+
 func GetFindInNulPoint() <-chan bool {
 	p := NewBoolPacket(337)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
-_find_graphic = _ScriptMethod(131)  # FindTypeEx
-_find_graphic.restype = _uint
-_find_graphic.argtypes = [_ushort,  # ObjType
-                          _ushort,  # Color
-                          _uint,  # Container
-                          _bool]  # InSub
-func FindTypeEx(ObjType, Color, Container=None, InSub=True){
-    if Container is None:
-}
-        Container = Backpack()
-    p :=
-p.send(senderFunc)
-// return _find_graphic(ObjType, Color, Container, InSub)
-*/
 func FindTypeEx(objType, objColor uint16, container uint32, inSub bool) <-chan uint32 {
 	p := NewUint32Packet(SCFindTypeEx, objType, objColor, container, inSub)
 	p.send(senderFunc)
@@ -800,7 +786,6 @@ func FindType(objType uint16, container uint32) <-chan uint32 {
 }
 
 /*
-// return _find_graphic(ObjType, 0xFFFF, Container, False)
 _find_graphics_array = _ScriptMethod(340)  # FindTypesArrayEx
 _find_graphics_array.restype = _uint
 _find_graphics_array.argtypes = [_uint,  # Len
@@ -810,50 +795,47 @@ _find_graphics_array.argtypes = [_uint,  # Len
                                  _uint,  # Len3
                                  _buffer,  # ArrayBytes3
                                  _bool]  # InSub
-func FindTypesArrayEx(ObjTypes, Colors, Containers, InSub){
-    args = []
-}
-    for array, fmt in ((ObjTypes, 'H'),
-                       (Colors, 'H'),
-                       (Containers, 'I')):
-        args += [len(array), _struct.pack('<' + str(len(array)) + fmt, *array)]
-    args.append(InSub)
-    p :=
-p.send(senderFunc)
-// return _find_graphics_array(*args)
-_find_notoriety = _ScriptMethod(132)  # FindNotoriety
-_find_notoriety.restype = _uint
-_find_notoriety.argtypes = [_ushort,  # ObjType
-                            _ubyte]  # Notoriety
-func FindNotoriety(ObjType, Notoriety){
-    p :=
-p.send(senderFunc)
-// return _find_notoriety(ObjType, Notoriety)
-}
-_find_at_point = _ScriptMethod(133)  # FindAtCoord
-_find_at_point.restype = _uint
-_find_at_point.argtypes = [_ushort,  # X
-                           _ushort]  # Y
-func FindAtCoord(X, Y){
-    p :=
-p.send(senderFunc)
-// return _find_at_point(X, Y)
-}
+
 */
+
+// Ищет по заданному массиву типов ObjTypes и массиву цветов Colors в массиве контейнеров Containers.
+// Если InSub включено, то поиск будет осуществляться в сабконтейнерах (рекурсивно).
+// Внутри метод перебором проходит через все типы\цвета\контейнеры и выполняет обычный Findtypeex.
+//
+// Example 1 - ищет на земле заданные типы (животные, чаты и т.д.):
+//
+// FindDistance := 20;
+// FindVertical := 10;
+// FindTypesArrayEx([$29A, $29B, $190, $191, $25d, $25e, $192, $193, $25f, $260, $2ea, $2ec, $2ed, $84, $f6, $19, $db, $51, $7a, $2ee, $2e8, $2e9, $2eb, $117, $116, $115],[$FFFF],[Ground],false);
+// AddToSystemJournal('FindCount = ' + IntToStr(FindCount));
+func FindTypesArrayEx(objTypes, colors []uint16, containers []uint32, inSub bool) <-chan uint32 {
+	p := NewUint32Packet(SCFindTypesArrayEx, objTypes, colors, containers, inSub)
+	p.send(senderFunc)
+	return p.out
+}
+
+func FindNotoriety(objType uint16, notoriety byte) <-chan uint32 {
+	p := NewUint32Packet(SCFindNotoriety, objType, notoriety)
+	p.send(senderFunc)
+	return p.out
+}
+
+func FindAtCoord(x, y uint16) <-chan uint32 {
+	p := NewUint32Packet(SCFindAtCoord, x, y)
+	p.send(senderFunc)
+	return p.out
+
+}
 func Ignore(ObjID uint32) {
 	p := NewVoidPacket(134, ObjID)
 	p.send(senderFunc)
 }
 
-/*
- */
 func IgnoreOff(ObjID uint32) {
 	p := NewVoidPacket(135, ObjID)
 	p.send(senderFunc)
 }
 
-/*
- */
 func IgnoreReset() {
 	p := NewVoidPacket(136)
 	p.send(senderFunc)
@@ -871,21 +853,13 @@ func GetIgnoreList(){
         fmt = '<' + count * 'I'
         result.extend(_struct.unpack(fmt, data[4:]))
     return result
-_get_found_objects_list = _ScriptMethod(138)  # GetFindedList
-_get_found_objects_list.restype = _buffer  # TArray
 */
+
 func GetFoundList() <-chan []uint32 {
 	p := NewGetFindListPacket()
 	p.send(senderFunc)
 	return p.out
 }
-
-// data = _get_found_objects_list()
-// count = _uint.from_buffer(data)
-// if count:
-//     fmt = '<' + count * 'I'
-//     result.extend(_struct.unpack(fmt, data[4:]))
-// return result
 
 func FindItem() <-chan uint32 {
 	p := NewUint32Packet(139)
@@ -923,43 +897,30 @@ func PredictedY() <-chan uint16 {
 	return p.out
 }
 
-/*
-_predicted_z = _ScriptMethod(145)  # PredictedZ
-_predicted_z.restype = _byte
-func PredictedZ(){
-    return _predicted_z()
+func PredictedZ() <-chan byte {
+	p := NewBytePacket(SCPredictedZ)
+	p.send(senderFunc)
+	return p.out
 }
-_predicted_dir = _ScriptMethod(146)  # PredictedDirection
-_predicted_dir.restype = _ubyte
-func PredictedDirection(){
-    return _predicted_dir()
+
+func PredictedDirection() <-chan byte {
+	p := NewBytePacket(SCPredictedDirection)
+	p.send(senderFunc)
+	return p.out
 }
-_get_x = _ScriptMethod(15)  # GetX
-_get_x.restype = _ushort
-_get_x.argtypes = [_uint]  # ObjID
-*/
+
 func GetX(oid uint32) <-chan uint16 {
 	p := NewUint16Packet(SCGetX, oid)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
-_get_y = _ScriptMethod(16)  # GetY
-_get_y.restype = _ushort
-_get_y.argtypes = [_uint]  # ObjID
-*/
 func GetY(oid uint32) <-chan uint16 {
 	p := NewUint16Packet(SCGetY, oid)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
-_get_z = _ScriptMethod(17)  # GetZ
-_get_z.restype = _byte
-_get_z.argtypes = [_uint]  # ObjID
-*/
 func GetZ(oid uint32) <-chan byte {
 	p := NewBytePacket(SCGetZ, oid)
 	p.send(senderFunc)

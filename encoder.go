@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"reflect"
+	"time"
 	"unicode/utf16"
 )
 
@@ -63,11 +65,32 @@ func encodeBool(data bool, dataBytes *[]byte) {
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
 
-func transformData(dataBytes *[]byte, data []interface{}) {
-	for _, v := range data {
-		if v == nil {
-			continue
-		} else if str, ok := v.(string); ok {
+func encodeTime(data time.Time, dataBytes *[]byte) {
+	buf := new(bytes.Buffer)
+
+	t, _ := time.Parse(time.RFC3339, "1899-12-30T00:00:00Z")
+	delta := data.Sub(t)
+	seconds := (delta.Seconds() + float64(delta.Microseconds()/1000000))
+
+	r := (delta.Hours() * 24) + (seconds / 3600 / 24)
+	binary.Write(buf, binary.LittleEndian, r)
+	*dataBytes = append(*dataBytes, buf.Bytes()...)
+}
+
+func encodeIterable(dataBytes *[]byte, data reflect.Value) {
+	size := make([]byte, 4)
+	binary.LittleEndian.PutUint32(size, uint32(data.Len()))
+	*dataBytes = append(*dataBytes, size...)
+
+	for i := 0; i < data.Len(); i++ {
+		val := data.Index(i)
+		transformType(dataBytes, val.Interface())
+	}
+}
+
+func transformType(dataBytes *[]byte, v interface{}) {
+	if v != nil {
+		if str, ok := v.(string); ok {
 			encodeString(str, dataBytes)
 		} else if dword, ok := v.(uint32); ok {
 			encodeDWord(dword, dataBytes)
@@ -79,9 +102,24 @@ func transformData(dataBytes *[]byte, data []interface{}) {
 			encodeInt(int, dataBytes)
 		} else if boolean, ok := v.(bool); ok {
 			encodeBool(boolean, dataBytes)
+		} else if t, ok := v.(time.Time); ok {
+			encodeTime(t, dataBytes)
 		} else {
 			log.Fatalf("Failed to parse argument of type %v", fmt.Sprintf("%T", v))
 			os.Exit(500)
+		}
+	}
+}
+
+func transformData(dataBytes *[]byte, data []interface{}) {
+	for _, v := range data {
+		rt := reflect.ValueOf(v).Kind()
+		switch rt {
+		case reflect.Slice, reflect.Array:
+			varr := reflect.ValueOf(v)
+			encodeIterable(dataBytes, varr)
+		default:
+			transformType(dataBytes, v)
 		}
 	}
 }

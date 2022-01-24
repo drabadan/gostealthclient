@@ -1,7 +1,7 @@
 package gostealthclient
 
 var (
-	debug = false
+	debug = true
 )
 
 var increment uint16 = 0
