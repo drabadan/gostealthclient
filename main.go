@@ -9,7 +9,7 @@ var receiverFunc func(s uint16, rtype byte) []byte
 var packetLog = make([]*scPacketData, 0)
 var responsesLog = make([][]byte, 0)
 
-func Bootstrap(script func()) {
+func Bootstrap(script func() interface{}) interface{} {
 	conn, err := connectScript()
 	if err != nil {
 		os.Exit(1)
@@ -19,5 +19,5 @@ func Bootstrap(script func()) {
 	senderFunc = sender(conn)
 	mws := make([]func(readBuff []byte) []byte, 0)
 	receiverFunc = defaultReceiver(conn, &mws)
-	script()
+	return script()
 }

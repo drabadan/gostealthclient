@@ -108,13 +108,13 @@ func NewBoolPacket(packetNum uint16, args ...interface{}) *boolPacket {
 
 type intPacket struct {
 	scPacketData
-	out chan int
+	out chan int32
 }
 
 func NewIntPacket(packetNum uint16, args ...interface{}) *intPacket {
 	p := &intPacket{}
 	p.setSendBytes(packetNum, args...)
-	p.out = make(chan int)
+	p.out = make(chan int32)
 	go receiveInt(p.out)
 	return p
 }

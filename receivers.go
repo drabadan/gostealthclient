@@ -126,13 +126,13 @@ func receiveBool(r chan bool) {
 	r <- readBool()
 }
 
-func readInt() int {
+func readInt() int32 {
 	replyBuf := receiverFunc(readReplySize(), BODY_READ_TYPE)
-	i, _ := binary.Varint(replyBuf[4:])
-	return int(i)
+	i := binary.LittleEndian.Uint32(replyBuf[4:])
+	return int32(i)
 }
 
-func receiveInt(r chan int) {
+func receiveInt(r chan int32) {
 	defer close(r)
 
 	time.Sleep(READ_DELAY)

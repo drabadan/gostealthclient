@@ -53,8 +53,8 @@ func CharName() <-chan string {
 	p.send(senderFunc)
 	return p.out
 }
-func ChangeProfile(profileName string) <-chan uint16 {
-	p := NewUint16Packet(SCChangeProfile, profileName)
+func ChangeProfile(profileName string) <-chan int32 {
+	p := NewIntPacket(SCChangeProfile, profileName)
 	p.send(senderFunc)
 	return p.out
 }
@@ -670,11 +670,14 @@ func LastJournalMessage() <-chan string {
 _get_journal_line_index = _ScriptMethod(121)  # InJournal
 _get_journal_line_index.restype = _int
 _get_journal_line_index.argtypes = [_str]  # Str
-func InJournal(Str){
-    p :=
-p.send(senderFunc)
-// return _get_journal_line_index(Str)
+*/
+func InJournal(s string) <-chan int32 {
+	p := NewIntPacket(SCInJournal, s)
+	p.send(senderFunc)
+	return p.out
 }
+
+/*
 _get_journal_line_index_time = _ScriptMethod(122)  # InJournalBetweenTimes
 _get_journal_line_index_time.restype = _int
 _get_journal_line_index_time.argtypes = [_str,  # Str
