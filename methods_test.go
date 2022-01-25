@@ -10,6 +10,7 @@ import (
 func TestInjournalBetweenTimes(t *testing.T) {
 	t.Run("Should return -1 if string is not found", func(t *testing.T) {
 		s := func() interface{} {
+			sc.ClearJournal()
 			tb, _ := time.Parse(time.RFC3339, "2020-12-30T00:00:00Z")
 			return <-sc.InJournalBetweenTimes("test", tb, time.Now())
 		}
@@ -23,10 +24,12 @@ func TestInjournalBetweenTimes(t *testing.T) {
 	const str = "test"
 	t.Run("Should return >= 0 if string is found", func(t *testing.T) {
 		s := func() interface{} {
-			tb, _ := time.Parse(time.RFC3339, "2020-12-30T00:00:00Z")
+			tb := time.Now()
 			sc.UOSay(str)
+			time.Sleep(time.Second * 2)
 			return <-sc.InJournalBetweenTimes(str, tb, time.Now())
 		}
+
 		ans := sc.Bootstrap(s)
 		res, ok := ans.(int32)
 		if !ok || res == -1 {
@@ -51,6 +54,7 @@ func TestJournalLine(t *testing.T) {
 	t.Run("If line found should return >= 0", func(t *testing.T) {
 		s := func() interface{} {
 			sc.UOSay(str)
+			time.Sleep(time.Second * 2)
 			return <-sc.InJournal(str)
 		}
 		ans := sc.Bootstrap(s)
@@ -90,4 +94,15 @@ func TestFindTypesArrayEx(t *testing.T) {
 			t.Errorf("Failed to find any items")
 		}
 	})
+}
+
+func TestConnectedTime(t *testing.T) {
+
+	s := func() interface{} {
+		return <-sc.ConnectedTime()
+	}
+	ans := sc.Bootstrap(s)
+	res, ok := ans.(time.Time)
+	t.Log(res, ok)
+
 }

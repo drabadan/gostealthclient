@@ -785,19 +785,6 @@ func FindType(objType uint16, container uint32) <-chan uint32 {
 	return FindTypeEx(objType, 0xffff, container, false)
 }
 
-/*
-_find_graphics_array = _ScriptMethod(340)  # FindTypesArrayEx
-_find_graphics_array.restype = _uint
-_find_graphics_array.argtypes = [_uint,  # Len
-                                 _buffer,  # ArrayBytes
-                                 _uint,  # Len2
-                                 _buffer,  # ArrayBytes2
-                                 _uint,  # Len3
-                                 _buffer,  # ArrayBytes3
-                                 _bool]  # InSub
-
-*/
-
 // Ищет по заданному массиву типов ObjTypes и массиву цветов Colors в массиве контейнеров Containers.
 // Если InSub включено, то поиск будет осуществляться в сабконтейнерах (рекурсивно).
 // Внутри метод перебором проходит через все типы\цвета\контейнеры и выполняет обычный Findtypeex.

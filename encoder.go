@@ -65,14 +65,12 @@ func encodeBool(data bool, dataBytes *[]byte) {
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
 
-func encodeTime(data time.Time, dataBytes *[]byte) {
+func EncodeTime(data time.Time, dataBytes *[]byte) {
 	buf := new(bytes.Buffer)
-
-	t, _ := time.Parse(time.RFC3339, "1899-12-30T00:00:00Z")
+	loc, _ := time.LoadLocation("Europe/Berlin")
+	t := time.Date(1899, 12, 30, 00, 00, 00, 00, loc)
 	delta := data.Sub(t)
-	seconds := (delta.Seconds() + float64(delta.Microseconds()/1000000))
-
-	r := (delta.Hours() * 24) + (seconds / 3600 / 24)
+	r := float64(delta.Microseconds()) / 1000000 / 60 / 60 / 24
 	binary.Write(buf, binary.LittleEndian, r)
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
@@ -103,7 +101,7 @@ func transformType(dataBytes *[]byte, v interface{}) {
 		} else if boolean, ok := v.(bool); ok {
 			encodeBool(boolean, dataBytes)
 		} else if t, ok := v.(time.Time); ok {
-			encodeTime(t, dataBytes)
+			EncodeTime(t, dataBytes)
 		} else {
 			log.Fatalf("Failed to parse argument of type %v", fmt.Sprintf("%T", v))
 			os.Exit(500)
