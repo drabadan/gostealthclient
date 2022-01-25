@@ -65,7 +65,7 @@ func encodeBool(data bool, dataBytes *[]byte) {
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
 
-func EncodeTime(data time.Time, dataBytes *[]byte) {
+func encodeTime(data time.Time, dataBytes *[]byte) {
 	buf := new(bytes.Buffer)
 	loc, _ := time.LoadLocation("Europe/Berlin")
 	t := time.Date(1899, 12, 30, 00, 00, 00, 00, loc)
@@ -101,7 +101,7 @@ func transformType(dataBytes *[]byte, v interface{}) {
 		} else if boolean, ok := v.(bool); ok {
 			encodeBool(boolean, dataBytes)
 		} else if t, ok := v.(time.Time); ok {
-			EncodeTime(t, dataBytes)
+			encodeTime(t, dataBytes)
 		} else {
 			log.Fatalf("Failed to parse argument of type %v", fmt.Sprintf("%T", v))
 			os.Exit(500)
