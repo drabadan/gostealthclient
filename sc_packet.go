@@ -347,3 +347,28 @@ func NewIsWorldCellPassablePacket(args ...interface{}) *isWorldCellPassablePacke
 	go p.transform()
 	return p
 }
+
+type scPoint2DPacket struct {
+	scCompositePacketData
+	out chan Point2D
+}
+
+func (p *scPoint2DPacket) transform() {
+	defer close(p.out)
+	b := <-p.rb
+	r := Point2D{
+		X: binary.LittleEndian.Uint16(b[4:6]),
+		Y: binary.LittleEndian.Uint16(b[6:8]),
+	}
+	p.out <- r
+}
+
+func NewPoint2DPacket(packetNum uint16, args ...interface{}) *scPoint2DPacket {
+	p := &scPoint2DPacket{}
+	p.setSendBytes(packetNum, args...)
+	p.rb = make(chan []byte)
+	p.out = make(chan Point2D)
+	go receiveByteArray(p.rb)
+	go p.transform()
+	return p
+}

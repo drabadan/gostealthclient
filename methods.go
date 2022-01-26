@@ -2728,8 +2728,6 @@ func WaitForClientTargetResponse(MaxWaitTimeMS){
             return True
         Wait(10)
     return False
-_check_lag_begin = _ScriptMethod(297)  # CheckLagBegin
-_check_lag_end = _ScriptMethod(298)  # CheckLagEnd
 */
 
 func CheckLag(timeoutMS uint32) <-chan bool {
@@ -2738,25 +2736,12 @@ func CheckLag(timeoutMS uint32) <-chan bool {
 	return p.out
 }
 
-/*
-    result = False
-    _check_lag_begin()
-    while _time.time() < end:
-        if _is_check_lag_ended():
-            return True
-    _check_lag_end()
-    return result
-_get_quest_arrow = _ScriptMethod(300)  # GetQuestArrow
-_get_quest_arrow.restype = _buffer  # TPoint
-func GetQuestArrow(){
-    data = _get_quest_arrow()
+func GetQuestArrow() <-chan Point2D {
+	p := NewPoint2DPacket(SCGetQuestArrow)
+	p.send(senderFunc)
+	return p.out
 }
-    if data:
-        p :=
-p.send(senderFunc)
-// return _struct.unpack('<ii', data)
-    return ()
-*/
+
 func GetSilentMode() <-chan bool {
 	p := NewBoolPacket(302)
 	p.send(senderFunc)
@@ -2804,92 +2789,50 @@ func GetShardPath() <-chan string {
 	return p.out
 }
 
-/*
-_step = _ScriptMethod(324)  # Step
-_step.restype = _ubyte
-_step.argtypes = [_ubyte,  # Direction
-                  _bool]  # Running
-*/
 func Step(direction byte, running bool) <-chan byte {
 	p := NewBytePacket(SCStep, direction, running)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
-_step_q = _ScriptMethod(325)  # StepQ
-_step_q.restype = _int
-_step_q.argtypes = [_ubyte,  # Direction
-                    _bool]  # Running
-*/
 func StepQ(direction byte, running bool) <-chan int32 {
 	p := NewIntPacket(SCStepQ, direction, running)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
-_move_xyz = _ScriptMethod(326)  # MoveXYZ
-_move_xyz.restype = _bool
-_move_xyz.argtypes = [_ushort,  # Xdst
-                      _ushort,  # Ydst
-                      _byte,  # Zdst
-                      _int,  # AccuracyXY
-                      _int,  # AccuracyZ
-                      _bool]  # Running
-                      func MoveXYZ(Xdst, Ydst, Zdst, AccuracyXY, AccuracyZ, Running){
-                          p :=
-                          p.send(senderFunc)
-                          // return _move_xyz(Xdst, Ydst, Zdst, AccuracyXY, AccuracyZ, Running)
-                        }
-*/
+func MoveXYZ(xdst, ydst uint16, zdst int8, optimized bool, accuracyXY, accurancyZ int32, running bool) <-chan bool {
+	p := NewBoolPacket(SCMoveXYZ, xdst, ydst, zdst, accuracyXY, accurancyZ, running)
+	p.send(senderFunc)
+	return p.out
+}
 
-func NewMoveXY(xdst, ydst uint16, optimized bool, accuracy int32, running bool) <-chan bool {
+func MoveXY(xdst, ydst uint16, optimized bool, accuracy int32, running bool) <-chan bool {
 	p := NewBoolPacket(SCMoveXY, xdst, ydst, optimized, accuracy, running)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
-_move_xy = _ScriptMethod(327)  # MoveXY
-_move_xy.restype = _bool
-_move_xy.argtypes = [_ushort,  # Xdst
-                     _ushort,  # Ydst
-                     _bool,  # Optimized
-                     _int,  # AccuracyXY
-                     _bool]  # Running
-func MoveXY(Xdst, Ydst, Optimized, Accuracy, Running){
-    p :=
-p.send(senderFunc)
-// return _move_xy(Xdst, Ydst, Optimized, Accuracy, Running)
+func SetBadLocation(x, y uint16) {
+	p := NewVoidPacket(SCSetBadLocation, x, y)
+	p.send(senderFunc)
 }
-_set_impassable_location = _ScriptMethod(328)  # SetBadLocation
-_set_impassable_location.argtypes = [_ushort,  # X
-                                     _ushort]  # Y
-func SetBadLocation(X, Y){
-    _set_impassable_location(X, Y)
+
+func SetGoodLocation(x, y uint16) {
+	p := NewVoidPacket(SCSetGoodLocation, x, y)
+	p.send(senderFunc)
 }
-_set_passable_location = _ScriptMethod(329)  # SetGoodLocation
-_set_passable_location.argtypes = [_ushort,  # X
-                                   _ushort]  # Y
-func SetGoodLocation(X, Y){
-    _set_passable_location(X, Y)
-}
-*/
+
 func ClearBadLocationList() {
 	p := NewVoidPacket(330)
 	p.send(senderFunc)
 }
 
-/*
-_set_impassable_object = _ScriptMethod(331)  # SetBadObject
-_set_impassable_object.argtypes = [_ushort,  # Type
-                                   _ushort,  # Color
-                                   _ubyte]  # Radius
-func SetBadObject(Type, Color, Radius){
-    _set_impassable_object(Type, Color, Radius)
+func SetBadObject(otype, color uint16, radius byte) {
+	p := NewVoidPacket(SCSetBadObject, otype, color, radius)
+	p.send(senderFunc)
 }
-*/
+
 func ClearBadObjectList() {
 	p := NewVoidPacket(332)
 	p.send(senderFunc)
@@ -3018,76 +2961,61 @@ func SetRunUnmountTimer(Value uint16) {
 	p.send(senderFunc)
 }
 
-/*
- */
 func SetWalkMountTimer(Value uint16) {
 	p := NewVoidPacket(317, Value)
 	p.send(senderFunc)
 }
 
-/*
- */
 func SetRunMountTimer(Value uint16) {
 	p := NewVoidPacket(318, Value)
 	p.send(senderFunc)
 }
 
-/*
- */
 func SetWalkUnmountTimer(Value uint16) {
 	p := NewVoidPacket(319, Value)
 	p.send(senderFunc)
 }
 
-/*
- */
 func GetRunMountTimer() <-chan uint16 {
 	p := NewUint16Packet(320)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
- GetWalkMountTimer() <-chan uint16 {
- p := NewUint16Packet(321)
- p.send(senderFunc)
- return p.out
+func GetWalkMountTimer() <-chan uint16 {
+	p := NewUint16Packet(321)
+	p.send(senderFunc)
+	return p.out
 }
-/*
-*/
+
 func GetRunUnmountTimer() <-chan uint16 {
 	p := NewUint16Packet(322)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
- */
 func GetWalkUnmountTimer() <-chan uint16 {
 	p := NewUint16Packet(323)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
- */
 func GetLastStepQUsedDoor() <-chan uint32 {
 	p := NewUint32Packet(344)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
- */
 func StopMover() {
 	p := NewVoidPacket(353)
 	p.send(senderFunc)
 }
 
-/*
-func MoverStop(){
-    StopMover()
+func MoverStop() {
+	StopMover()
 }
+
+/*
 _set_reconnector_ext = _ScriptMethod(354)  # SetARExtParams
 _set_reconnector_ext.argtypes = [_str,  # ShardName
                                  _str,  # CharName
@@ -3107,29 +3035,21 @@ func BandageSelf() {
 	p.send(senderFunc)
 }
 
-/*
- */
 func GlobalChatJoinChannel(chName string) {
 	p := NewVoidPacket(361, chName)
 	p.send(senderFunc)
 }
 
-/*
- */
 func GlobalChatLeaveChannel() {
 	p := NewVoidPacket(362)
 	p.send(senderFunc)
 }
 
-/*
- */
 func GlobalChatSendMsg(msgText string) {
 	p := NewVoidPacket(363, msgText)
 	p.send(senderFunc)
 }
 
-/*
- */
 func GlobalChatActiveChannel() <-chan string {
 	p := NewStringPacket(364)
 	p.send(senderFunc)
@@ -3162,106 +3082,72 @@ func GetMoveOpenDoor() <-chan bool {
 	return p.out
 }
 
-/*
- */
 func SetMoveThroughNPC(Value uint16) {
 	p := NewVoidPacket(402, Value)
 	p.send(senderFunc)
 }
 
-/*
- */
 func GetMoveThroughNPC() <-chan uint16 {
 	p := NewUint16Packet(403)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
-_set_move_through_corner = _ScriptMethod(404)  # SetMoveThroughCorner
-_set_move_through_corner.argtypes = [_bool]  # Value
-func SetMoveThroughCorner(Value){
-    _set_move_through_corner(Value)
+func SetMoveThroughCorner(value bool) {
+	p := NewVoidPacket(SCGetMoveThroughCorner, value)
+	p.send(senderFunc)
 }
-*/
+
 func GetMoveThroughCorner() <-chan bool {
 	p := NewBoolPacket(405)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
-_set_move_heuristic_mult = _ScriptMethod(406)  # SetMoveHeuristicMult
-_set_move_heuristic_mult.argtypes = [_int]  # Value
-func SetMoveHeuristicMult(Value){
-    _set_move_heuristic_mult(Value)
+func SetMoveHeuristicMult(value int32) {
+	p := NewVoidPacket(SCSetMoveHeuristicMult, value)
+	p.send(senderFunc)
 }
-*/
+
 func GetMoveHeuristicMult() <-chan uint32 {
 	p := NewUint32Packet(407)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
- */
 func SetMoveCheckStamina(Value uint16) {
 	p := NewVoidPacket(408, Value)
 	p.send(senderFunc)
 }
 
-/*
- */
 func GetMoveCheckStamina() <-chan uint16 {
 	p := NewUint16Packet(409)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
-_set_move_turn_cost = _ScriptMethod(410)  # SetMoveTurnCost
-_set_move_turn_cost.argtypes = [_int]  # Value
-func SetMoveTurnCost(Value){
-    _set_move_turn_cost(Value)
+func SetMoveTurnCost(value uint32) {
+	p := NewVoidPacket(SCSetMoveTurnCost, value)
+	p.send(senderFunc)
 }
-*/
+
 func GetMoveTurnCost() <-chan uint32 {
 	p := NewUint32Packet(411)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
-_set_move_between_two_corners = _ScriptMethod(412)  # SetMoveBetweenTwoCorners
-_set_move_between_two_corners.argtypes = [_bool]  # Value
-func SetMoveBetweenTwoCorners(Value){
-    _set_move_between_two_corners(Value)
+func SetMoveBetweenTwoCorners(value bool) {
+	p := NewVoidPacket(SCSetMoveBetweenTwoCorners, value)
+	p.send(senderFunc)
 }
-*/func GetMoveBetweenTwoCorners() <-chan bool {
+
+func GetMoveBetweenTwoCorners() <-chan bool {
 	p := NewBoolPacket(413)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
-func StartStealthSocketInstance(*args, **kwargs){
-    Wait(10)
-}
-func CorrectDisconnection(){
-    _get_connection().close()
-}
-func PlayWav(FileName){
-    import platform
-}
-    if platform.system() == 'Windows':
-        import winsound
-        winsound.PlaySound(FileName, winsound.SND_FILENAME)
-    else:
-        error = 'PlayWav supports only windows.'
-        AddToSystemJournal(error)
-_get_multis = _ScriptMethod(347)  # GetMultis
-_get_multis.restype = _buffer
-*/
 func GetMultis() <-chan []Multi {
 	p := NewGetMultisPacket()
 	p.send(senderFunc)
@@ -3437,44 +3323,38 @@ def CreateChar(
         City,           # Start City
         Slot,           # Free Slot
     )
-# Script control functions_get_script_count = _ScriptMethod(450)
-_get_script_count.restype = _ushort
-func GetScriptCount(){
-    return _get_script_count()
-}
-_get_script_path = _ScriptMethod(451)
-_get_script_path.argtypes = [_ushort]
-_get_script_path.restype = _str
-func GetScriptPath(ScriptIndex){
-    p :=
-p.send(senderFunc)
-// return _get_script_path(ScriptIndex)
-}
-_get_script_name = _ScriptMethod(452)
-_get_script_name.argtypes = [_ushort]
-_get_script_name.restype = _str
-func GetScriptName(ScriptIndex){
-    p :=
-p.send(senderFunc)
-// return _get_script_name(ScriptIndex)
-}
-_get_script_state = _ScriptMethod(453)
-_get_script_state.argtypes = [_ushort]
-_get_script_state.restype = _byte
-func GetScriptState(ScriptIndex){
-    p :=
-p.send(senderFunc)
-// return _get_script_state(ScriptIndex)
-}
-_start_script = _ScriptMethod(454)
-_start_script.argtypes = [_str]
-_start_script.restype = _ushort
-func StartScript(ScriptPath){
-    p :=
-p.send(senderFunc)
-// return _start_script(ScriptPath)
-}
 */
+//# Script control functions
+func GetScriptCount() <-chan uint16 {
+	p := NewUint16Packet(SCGetScriptsCount)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetScriptPath(scriptIndex uint16) <-chan string {
+	p := NewStringPacket(SCGetScriptPath, scriptIndex)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetScriptName(ScriptIndex uint16) <-chan string {
+	p := NewStringPacket(SCGetScriptName, ScriptIndex)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetScriptState(scriptIndex uint16) <-chan int8 {
+	p := NewInt8Packet(SCGetScriptState, scriptIndex)
+	p.send(senderFunc)
+	return p.out
+
+}
+
+func StartScript(scriptPath string) <-chan uint16 {
+	p := NewUint16Packet(SCStartScript, scriptPath)
+	p.send(senderFunc)
+	return p.out
+}
 
 func StopScript(scriptIndex uint16) {
 	p := NewVoidPacket(456)

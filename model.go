@@ -15,3 +15,7 @@ type WorldCellPassable struct {
 	Passable bool
 	Z        int8
 }
+
+type Point2D struct {
+	X, Y uint16
+}
