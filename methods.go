@@ -828,22 +828,14 @@ func IgnoreReset() {
 	p.send(senderFunc)
 }
 
-/*
-_get_ignore_list = _ScriptMethod(137)  # GetIgnoreList
-_get_ignore_list.restype = _buffer  # TArray
-func GetIgnoreList(){
-    result = []
+func GetIgnoreList() <-chan []uint32 {
+	p := NewUint32ArrayPacket(SCGetIgnoreList)
+	p.send(senderFunc)
+	return p.out
 }
-    data = _get_ignore_list()
-    count = _uint.from_buffer(data)
-    if count:
-        fmt = '<' + count * 'I'
-        result.extend(_struct.unpack(fmt, data[4:]))
-    return result
-*/
 
 func GetFoundList() <-chan []uint32 {
-	p := NewGetFindListPacket()
+	p := NewUint32ArrayPacket(SCGetFindedList)
 	p.send(senderFunc)
 	return p.out
 }
@@ -914,52 +906,44 @@ func GetZ(oid uint32) <-chan byte {
 	return p.out
 }
 
+func GetName(oid uint32) <-chan string {
+	p := NewStringPacket(SCGetName, oid)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetAltName(oid uint32) <-chan string {
+	p := NewStringPacket(SCGetAltName, oid)
+	p.send(senderFunc)
+	return p.out
+
+}
+
+func GetTitle(oid uint32) <-chan string {
+	p := NewStringPacket(SCGetTitle)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetTooltip(oid uint32) <-chan string {
+	p := NewStringPacket(SCGetCliloc, oid)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetCliloc(oid uint32) <-chan string {
+	p := NewStringPacket(SCGetCliloc, oid)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetType(oid uint32) <-chan uint16 {
+	p := NewUint16Packet(SCGetType, oid)
+	p.send(senderFunc)
+	return p.out
+}
+
 /*
-_get_name = _ScriptMethod(147)  # GetName
-_get_name.restype = _str
-_get_name.argtypes = [_uint]  # ObjectID
-func GetName(ObjectID){
-    p :=
-p.send(senderFunc)
-// return _get_name(ObjectID)
-}
-_get_alt_name = _ScriptMethod(148)  # GetAltName
-_get_alt_name.restype = _str
-_get_alt_name.argtypes = [_uint]  # ObjectID
-func GetAltName(ObjectID){
-    p :=
-p.send(senderFunc)
-// return _get_alt_name(ObjectID)
-}
-_get_title = _ScriptMethod(149)  # GetTitle
-_get_title.restype = _str
-_get_title.argtypes = [_uint]  # ObjID
-func GetTitle(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_title(ObjID)
-}
-_get_tooltip = _ScriptMethod(150)  # GetTooltip
-_get_tooltip.restype = _str
-_get_tooltip.argtypes = [_uint]  # ObjID
-func GetTooltip(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_tooltip(ObjID)
-}
-func GetCliloc(ObjID){
-    p :=
-p.send(senderFunc)
-// return GetTooltip(ObjID)
-}
-_get_graphic = _ScriptMethod(151)  # GetType
-_get_graphic.restype = _ushort
-_get_graphic.argtypes = [_uint]  # ObjID
-func GetType(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_graphic(ObjID)
-}
 _get_tooltip_obj = _ScriptMethod(152)  # GetToolTipRec
 _get_tooltip_obj.restype = _buffer  # Array of TClilocRec
 _get_tooltip_obj.argtypes = [_uint]  # ObjID
@@ -979,245 +963,180 @@ func GetTooltipRec(ObjID){
             strings.append(string.value)
         result.append({'Cliloc_ID': cliloc, 'Params': strings})
     return result
-_get_object_tooltip = _ScriptMethod(153)  # GetClilocByID
-_get_object_tooltip.restype = _str
-_get_object_tooltip.argtypes = [_uint]  # ClilocID
-func GetClilocByID(ClilocID){
-    p :=
-p.send(senderFunc)
-// return _get_object_tooltip(ClilocID)
-}
-_get_quantity = _ScriptMethod(154)  # GetQuantity
-_get_quantity.restype = _int
-_get_quantity.argtypes = [_uint]  # ObjID
-func GetQuantity(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_quantity(ObjID)
-}
-_is_object_exists = _ScriptMethod(155)  # IsObjectExists
-_is_object_exists.restype = _bool
-_is_object_exists.argtypes = [_uint]  # ObjID
-func IsObjectExists(ObjID){
-    p :=
-p.send(senderFunc)
-// return _is_object_exists(ObjID)
-}
-_is_npc = _ScriptMethod(172)  # IsNPC
-_is_npc.restype = _bool
-_is_npc.argtypes = [_uint]  # ObjID
-func IsNPC(ObjID){
-    p :=
-p.send(senderFunc)
-// return _is_npc(ObjID)
-}
-_get_price = _ScriptMethod(156)  # GetPrice
-_get_price.restype = _uint
-_get_price.argtypes = [_uint]  # ObjID
-func GetPrice(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_price(ObjID)
-}
-_get_direction = _ScriptMethod(157)  # GetDirection
-_get_direction.restype = _ubyte
-_get_direction.argtypes = [_uint]  # ObjID
-func GetDirection(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_direction(ObjID)
-}
-_get_distance = _ScriptMethod(158)  # GetDistance
-_get_distance.restype = _int
-_get_distance.argtypes = [_uint]  # ObjID
-func GetDistance(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_distance(ObjID)
-}
-_get_color = _ScriptMethod(159)  # GetColor
-_get_color.restype = _ushort
-_get_color.argtypes = [_uint]  # ObjID
-func GetColor(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_color(ObjID)
-}
-_get_strength = _ScriptMethod(160)  # GetStr
-_get_strength.restype = _int
-_get_strength.argtypes = [_uint]  # ObjID
-func GetStr(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_strength(ObjID)
-}
-_get_intelligence = _ScriptMethod(161)  # GetInt
-_get_intelligence.restype = _int
-_get_intelligence.argtypes = [_uint]  # ObjID
-func GetInt(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_intelligence(ObjID)
-}
-_get_dexterity = _ScriptMethod(162)  # GetDex
-_get_dexterity.restype = _int
-_get_dexterity.argtypes = [_uint]  # ObjID
-func GetDex(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_dexterity(ObjID)
-}
-_get_hp = _ScriptMethod(163)  # GetHP
-_get_hp.restype = _int
-_get_hp.argtypes = [_uint]  # ObjID
-func GetHP(ObjID){
-    result = _get_hp(ObjID)
-}
-    if not result and _is_object_exists(ObjID) and _is_npc(ObjID):
-        _request_stats(ObjID)
-        Wait(100)
-        result = _get_hp(ObjID)
-    return result
-_get_max_hp = _ScriptMethod(164)  # GetMaxHP
-_get_max_hp.restype = _int
-_get_max_hp.argtypes = [_uint]  # ObjID
-func GetMaxHP(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_max_hp(ObjID)
-}
-_get_mana = _ScriptMethod(165)  # GetMana
-_get_mana.restype = _int
-_get_mana.argtypes = [_uint]  # ObjID
-func GetMana(ObjID){
-    result = _get_mana(ObjID)
-}
-    if not result and _is_object_exists(ObjID) and _is_npc(ObjID):
-        _request_stats(ObjID)
-        Wait(100)
-        result = _get_mana(ObjID)
-    return result
-_get_max_mana = _ScriptMethod(166)  # GetMaxMana
-_get_max_mana.restype = _int
-_get_max_mana.argtypes = [_uint]  # ObjID
-func GetMaxMana(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_max_mana(ObjID)
-}
-_get_stamina = _ScriptMethod(167)  # GetStam
-_get_stamina.restype = _int
-_get_stamina.argtypes = [_uint]  # ObjID
-func GetStam(ObjID){
-    result = _get_stamina(ObjID)
-}
-    if not result and _is_object_exists(ObjID) and _is_npc(ObjID):
-        _request_stats(ObjID)
-        Wait(100)
-        result = _get_stamina(ObjID)
-    return result
-_get_max_stamina = _ScriptMethod(168)  # GetMaxStam
-_get_max_stamina.restype = _int
-_get_max_stamina.argtypes = [_uint]  # ObjID
-func GetMaxStam(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_max_stamina(ObjID)
-}
-_get_notoriety = _ScriptMethod(169)  # GetNotoriety
-_get_notoriety.restype = _ubyte
-_get_notoriety.argtypes = [_uint]  # ObjId
-func GetNotoriety(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_notoriety(ObjID)
-}
-_get_container = _ScriptMethod(170)  # GetParent
-_get_container.restype = _uint
-_get_container.argtypes = [_uint]  # ObjID
-func GetParent(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_container(ObjID)
-}
-func IsWarMode(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_warmode(ObjID)
-}
-_get_dead_status = _ScriptMethod(173)  # IsDead
-_get_dead_status.restype = _bool
-_get_dead_status.argtypes = [_uint]  # ObjID
-func IsDead(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_dead_status(ObjID)
-}
-_get_running_status = _ScriptMethod(174)  # IsRunning
-_get_running_status.restype = _bool
-_get_running_status.argtypes = [_uint]  # ObjID
-func IsRunning(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_running_status(ObjID)
-}
-_is_container = _ScriptMethod(175)  # IsContainer
-_is_container.restype = _bool
-_is_container.argtypes = [_uint]  # ObjID
-func IsContainer(ObjID){
-    p :=
-p.send(senderFunc)
-// return _is_container(ObjID)
-}
-_get_hidden_status = _ScriptMethod(176)  # IsHidden
-_get_hidden_status.restype = _bool
-_get_hidden_status.argtypes = [_uint]  # ObjID
-func IsHidden(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_hidden_status(ObjID)
-}
-_is_movable = _ScriptMethod(177)  # IsMovable
-_is_movable.restype = _bool
-_is_movable.argtypes = [_uint]  # ObjID
-func IsMovable(ObjID){
-    p :=
-p.send(senderFunc)
-// return _is_movable(ObjID)
-}
-_get_yellow_hits_status = _ScriptMethod(178)  # IsYellowHits
-_get_yellow_hits_status.restype = _bool
-_get_yellow_hits_status.argtypes = [_uint]  # ObjID
-func IsYellowHits(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_yellow_hits_status(ObjID)
-}
-_get_poisoned_status = _ScriptMethod(179)  # IsPoisoned
-_get_poisoned_status.restype = _bool
-_get_poisoned_status.argtypes = [_uint]  #
-func IsPoisoned(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_poisoned_status(ObjID)
-}
-_get_paralyzed_status = _ScriptMethod(180)  # IsParalyzed
-_get_paralyzed_status.restype = _bool
-_get_paralyzed_status.argtypes = [_uint]  # ObjID
-func IsParalyzed(ObjID){
-    p :=
-p.send(senderFunc)
-// return _get_paralyzed_status(ObjID)
-}
-_is_female = _ScriptMethod(181)  # IsFemale
-_is_female.restype = _bool
-_is_female.argtypes = [_uint]  # ObjID
-func IsFemale(ObjID){
-    p :=
-p.send(senderFunc)
-// return _is_female(ObjID)
-}
 */
+func GetClilocByID(oid uint32) <-chan string {
+	p := NewStringPacket(SCGetClilocByID, oid)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetQuantity(oid uint32) <-chan int32 {
+	p := NewIntPacket(SCGetQuantity, oid)
+	p.send(senderFunc)
+	return p.out
+}
+
+func IsObjectExists(oid uint32) <-chan bool {
+	p := NewBoolPacket(SCIsObjectExists, oid)
+	p.send(senderFunc)
+	return p.out
+}
+
+func IsNPC(oid uint32) <-chan bool {
+	p := NewBoolPacket(SCIsNPC, oid)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetPrice(oid uint32) <-chan uint32 {
+	p := NewUint32Packet(SCGetPrice, oid)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetDirection(oid uint32) <-chan byte {
+	p := NewBytePacket(SCGetDirection, oid)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetDistance(oid uint32) <-chan int32 {
+	p := NewIntPacket(SCGetDistance, oid)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetColor(oid uint32) <-chan uint16 {
+	p := NewUint16Packet(SCGetColor, oid)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetStr(oid uint32) <-chan int32 {
+	p := NewIntPacket(SCGetStr, oid)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetInt(oid uint32) <-chan int32 {
+	p := NewIntPacket(SCGetInt, oid)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetDex(oid uint32) <-chan int32 {
+	p := NewIntPacket(SCGetDex, oid)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetHP(oid uint32) <-chan int32 {
+	p := NewIntPacket(SCGetHP, oid)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetMaxHP(oid uint32) <-chan int32 {
+	p := NewIntPacket(SCGetMaxHP, oid)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetMana(oid uint32) <-chan int32 {
+	p := NewIntPacket(SCGetMana, oid)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetMaxMana(ObjID uint32) <-chan int32 {
+	p := NewIntPacket(166, ObjID)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetStam(oid uint32) <-chan int32 {
+	p := NewIntPacket(SCGetStam, oid)
+	p.send(senderFunc)
+	return p.out
+}
+func GetMaxStam(ObjID uint32) <-chan int32 {
+	p := NewIntPacket(168, ObjID)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetNotoriety(oid uint32) <-chan byte {
+	p := NewBytePacket(SCGetNotoriety)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetParent(oid uint32) <-chan uint32 {
+	p := NewUint32Packet(SCGetParent, oid)
+	p.send(senderFunc)
+	return p.out
+}
+
+func IsWarMode(oid uint32) <-chan bool {
+	p := NewBoolPacket(SCIsWarMode, oid)
+	p.send(senderFunc)
+	return p.out
+}
+
+func IsDead(ObjID uint32) <-chan bool {
+	p := NewBoolPacket(173, ObjID)
+	p.send(senderFunc)
+	return p.out
+}
+
+func IsRunning(ObjID uint32) <-chan bool {
+	p := NewBoolPacket(174, ObjID)
+	p.send(senderFunc)
+	return p.out
+}
+
+func IsContainer(ObjID uint32) <-chan bool {
+	p := NewBoolPacket(175, ObjID)
+	p.send(senderFunc)
+	return p.out
+}
+
+func IsHidden(ObjID uint32) <-chan bool {
+	p := NewBoolPacket(176, ObjID)
+	p.send(senderFunc)
+	return p.out
+}
+
+func IsMovable(ObjID uint32) <-chan bool {
+	p := NewBoolPacket(177, ObjID)
+	p.send(senderFunc)
+	return p.out
+}
+
+func IsYellowHits(ObjID uint32) <-chan bool {
+	p := NewBoolPacket(178, ObjID)
+	p.send(senderFunc)
+	return p.out
+}
+
+func IsPoisoned(ObjID uint32) <-chan bool {
+	p := NewBoolPacket(179, ObjID)
+	p.send(senderFunc)
+	return p.out
+}
+
+func IsParalyzed(ObjID uint32) <-chan bool {
+	p := NewBoolPacket(180, ObjID)
+	p.send(senderFunc)
+	return p.out
+}
+
+func IsFemale(ObjID uint32) <-chan bool {
+	p := NewBoolPacket(181, ObjID)
+	p.send(senderFunc)
+	return p.out
+}
+
 func OpenDoor() {
 	p := NewVoidPacket(182)
 	p.send(senderFunc)
@@ -1380,8 +1299,7 @@ func ClearContextMenu() {
 	p.send(senderFunc)
 }
 
-/*
- */func IsTrade() <-chan bool {
+func IsTrade() <-chan bool {
 	p := NewBoolPacket(197)
 	p.send(senderFunc)
 	return p.out
@@ -1452,31 +1370,28 @@ _auto_menu.argtypes = [_str,  # MenuCaption
 func AutoMenu(MenuCaption, ElementCaption){
     _auto_menu(MenuCaption, ElementCaption)
 }
-*/func MenuHookPresent() <-chan bool {
+*/
+func MenuHookPresent() <-chan bool {
 	p := NewBoolPacket(207)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
- */func MenuPresent() <-chan bool {
+func MenuPresent() <-chan bool {
 	p := NewBoolPacket(208)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
- */
 func CancelMenu() {
 	p := NewVoidPacket(209)
 	p.send(senderFunc)
 }
 
-/*
-func CancelAllMenuHooks(){
-    _cancel_menu()
+func CancelAllMenuHooks() {
+	CancelMenu()
 }
-*/
+
 func CloseMenu() {
 	p := NewVoidPacket(210)
 	p.send(senderFunc)
@@ -1857,69 +1772,78 @@ func AddGumpIgnoreByID(ID uint32) {
 	p.send(senderFunc)
 }
 
-/*
- */
 func AddGumpIgnoreBySerial(Serial uint32) {
 	p := NewVoidPacket(231, Serial)
 	p.send(senderFunc)
 }
 
-/*
- */
 func ClearGumpsIgnore() {
 	p := NewVoidPacket(232)
 	p.send(senderFunc)
 }
 
-/**/
 func RhandLayer() byte {
 	return 0x01
 }
+
 func LhandLayer() byte {
 	return 0x02
 }
+
 func ShoesLayer() byte {
 	return 0x03
 }
+
 func PantsLayer() byte {
 	return 0x04
 }
 func ShirtLayer() byte {
 	return 0x05
 }
+
 func HatLayer() byte {
 	return 0x06
 }
+
 func GlovesLayer() byte {
 	return 0x07
 }
+
 func RingLayer() byte {
 	return 0x08
 }
+
 func TalismanLayer() byte {
 	return 0x09
 }
+
 func NeckLayer() byte {
 	return 0x0A
 }
 func HairLayer() byte {
 	return 0x0B
 }
+
 func WaistLayer() byte {
 	return 0x0C
 }
+
 func TorsoLayer() byte {
 	return 0x0D
 }
+
 func BraceLayer() byte {
 	return 0x0E
 }
+
 func BeardLayer() byte {
 	return 0x10
 }
+
 func TorsoHLayer() byte {
 	return 0x11
 }
+
 func EarLayer() byte {
 	return 0x12
 }
@@ -1929,50 +1853,56 @@ func ArmsLayer() byte {
 func CloakLayer() byte {
 	return 0x14
 }
+
 func BpackLayer() byte {
 	return 0x15
 }
+
 func RobeLayer() byte {
 	return 0x16
 }
+
 func EggsLayer() byte {
 	return 0x17
 }
 func LegsLayer() byte {
 	return 0x18
 }
+
 func HorseLayer() byte {
 	return 0x19
 }
+
 func RstkLayer() byte {
 	return 0x1A
 }
 func NRstkLayer() byte {
 	return 0x1B
 }
+
 func SellLayer() byte {
 	return 0x1C
 }
+
 func BankLayer() byte {
 	return 0x1D
 }
+
 func ObjAtLayerEx(layerType byte, playerID uint32) <-chan uint32 {
 	p := NewUint32Packet(SCObjAtLayerEx, layerType, playerID)
 	p.send(senderFunc)
 	return p.out
 }
+
 func ObjAtLayer(LayerType byte) <-chan uint32 {
 	return ObjAtLayerEx(LayerType, <-Self())
 }
+
 func GetLayer(Obj uint32) <-chan byte {
 	p := NewBytePacket(SCGetLayer)
 	p.send(senderFunc)
 	return p.out
-} /*
-_wear_item = _ScriptMethod(235)  # WearItem
-_wear_item.argtypes = [_ubyte,  # Layer
-                       _uint]  # Obj
-*/
+}
 
 func WearItem(layer byte, oid uint32) {
 	p := NewVoidPacket(SCWearItem, layer, oid)
@@ -2034,15 +1964,11 @@ func GetDressSpeed() <-chan uint16 {
 	return p.out
 }
 
-/*
- */
 func SetDressSpeed(Value uint16) {
 	p := NewVoidPacket(237, Value)
 	p.send(senderFunc)
 }
 
-/*
- */
 func GetClientVersionInt() <-chan uint32 {
 	p := NewUint32Packet(355)
 	p.send(senderFunc)
@@ -2087,8 +2013,6 @@ func SetDress() {
 	p.send(senderFunc)
 }
 
-/*
- */
 func EquipItemsSetMacro() {
 	p := NewVoidPacket(357)
 	p.send(senderFunc)
@@ -2135,14 +2059,18 @@ func CountEx(ObjType, Color, Container){
     FindTypeEx(ObjType, Color, Container, False)
 }
     return FindFullQuantity()
-def BP(): return 0X0F7A
-def BM(): return 0x0F7B
-def GA(): return 0x0F84
-def GS(): return 0x0F85
-def MR(): return 0x0F86
-def NS(): return 0x0F88
-def SA(): return 0x0F8C
-def SS(): return 0x0F8D
+
+*/
+func BP() uint16 { return 0x0F7A }
+func BM() uint16 { return 0x0F7B }
+func GA() uint16 { return 0x0F84 }
+func GS() uint16 { return 0x0F85 }
+func MR() uint16 { return 0x0F86 }
+func NS() uint16 { return 0x0F88 }
+func SA() uint16 { return 0x0F8C }
+func SS() uint16 { return 0x0F8D }
+
+/*
 func BPCount(){
     FindTypeEx(BP(), 0, Backpack(), True)
 }
@@ -2220,71 +2148,53 @@ func GetAutoBuyDelay() <-chan uint16 {
 	return p.out
 }
 
-/*
- */
 func SetAutoBuyDelay(Value uint16) {
 	p := NewVoidPacket(245, Value)
 	p.send(senderFunc)
 }
 
-/*
- */
 func GetAutoSellDelay() <-chan uint16 {
 	p := NewUint16Packet(246)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
- */
 func SetAutoSellDelay(Value uint16) {
 	p := NewVoidPacket(247, Value)
 	p.send(senderFunc)
 }
 
-/*
-_auto_sell = _ScriptMethod(248)  # AutoSell
-_auto_sell.argtypes = [_ushort,  # ItemType
-                       _ushort,  # ItemColor
-                       _ushort]  # Quantity
-func AutoSell(ItemType, ItemColor, Quantity){
-    _auto_sell(ItemType, ItemColor, Quantity)
+func AutoSell(itemType, itemColor, quantity uint16) {
+	p := NewVoidPacket(SCAutoSell, itemType, itemColor, quantity)
+	p.send(senderFunc)
 }
-*/
 func RequestStats(ObjID uint32) {
 	p := NewVoidPacket(249, ObjID)
 	p.send(senderFunc)
 }
 
-/*
- */
 func HelpRequest() {
 	p := NewVoidPacket(250)
 	p.send(senderFunc)
 }
 
-/*
- */
 func QuestRequest() {
 	p := NewVoidPacket(251)
 	p.send(senderFunc)
 }
 
+func RenameMobile(mobId uint32, newName string) {
+	p := NewVoidPacket(SCRenameMobile, mobId, newName)
+	p.send(senderFunc)
+}
+
+func MobileCanBeRenamed(Mob_ID uint32) <-chan bool {
+	p := NewBoolPacket(253, Mob_ID)
+	p.send(senderFunc)
+	return p.out
+}
+
 /*
-_rename_mobile = _ScriptMethod(252)  # RenameMobile
-_rename_mobile.argtypes = [_uint,  # Mob_ID
-                           _str]  # NewName
-func RenameMobile(Mob_ID, NewName){
-    _rename_mobile(Mob_ID, NewName)
-}
-_mobile_can_be_renamed = _ScriptMethod(253)  # MobileCanBeRenamed
-_mobile_can_be_renamed.restype = _bool
-_mobile_can_be_renamed.argtypes = [_uint]  # Mob_ID
-func MobileCanBeRenamed(Mob_ID){
-    p :=
-p.send(senderFunc)
-// return _mobile_can_be_renamed(Mob_ID)
-}
 _lock_stat = _ScriptMethod(254)  # ChangeStatLockState
 _lock_stat.argtypes = [_ubyte,  # statNum
                        _ubyte]  # statState
@@ -2312,8 +2222,6 @@ func Alarm() {
 	p.send(senderFunc)
 }
 
-/*
- */
 func UOSay(text string) {
 	p := NewVoidPacket(308, text)
 	p.send(senderFunc)
@@ -2367,8 +2275,6 @@ func ConsoleEntryUnicodeReply(text string) {
 	p.send(senderFunc)
 }
 
-/*
- */
 func GameServerIPString() <-chan string {
 	p := NewStringPacket(341)
 	p.send(senderFunc)
@@ -2428,8 +2334,6 @@ func EUO2StealthID(EUO){
     return (res - 7) ^ 0x0045
 */
 
-/*
- */
 func InviteToParty(ID uint32) {
 	p := NewVoidPacket(262, ID)
 	p.send(senderFunc)
@@ -2680,39 +2584,21 @@ func GetLayerCount(X, Y, WorldNum){
 p.send(senderFunc)
 // return _get_layer_count(X, Y, WorldNum)
 }
-_read_static_xy = _ScriptMethod(283)  # ReadStaticsXY
-_read_static_xy.restype = _buffer  # Array of TStaticItemRealXY
-_read_static_xy.argtypes = [_ushort,  # X
-                            _ushort,  # Y
-                            _ubyte]  # WorldNum
-func ReadStaticsXY(X, Y, WorldNum){
-    result = []
+*/
+
+func ReadStaticsXY(x, y uint16, wnum byte) <-chan []StaticsXY {
+	p := NewReadStaticsXYPacket(x, y, wnum)
+	p.send(senderFunc)
+	return p.out
 }
-    data = _read_static_xy(X, Y, WorldNum)
-    count = _uint.from_buffer(data)
-    fmt = '<3HbH'
-    size = _struct.calcsize(fmt)
-    keys = 'Tile', 'X', 'Y', 'Z', 'Color'
-    for i in range(count):
-        values = _struct.unpack_from(fmt, data, 4 + i * size)
-        item = dict(zip(keys, values))
-        result.append(item)    # if count:
-    #     keys = 'Tile', 'X', 'Y', 'Z', 'Color'
-    #     for pos in range(0, len(data), _struct.calcsize(fmt)):
-    #         values = _struct.unpack_from(fmt, data, pos)
-    #         item = dict(zip(keys, values))
-    #         result.append(item)
-    return result
-_get_surface_z = _ScriptMethod(284)  # GetSurfaceZ
-_get_surface_z.restype = _byte
-_get_surface_z.argtypes = [_ushort,  # X
-                           _ushort,  # Y
-                           _ubyte]  # WorldNum
-func GetSurfaceZ(X, Y, WorldNum){
-    p :=
-p.send(senderFunc)
-// return _get_surface_z(X, Y, WorldNum)
+
+func GetSurfaceZ(x, y uint16, worldNum byte) <-chan byte {
+	p := NewBytePacket(SCGetSurfaceZ, x, y, worldNum)
+	p.send(senderFunc)
+	return p.out
 }
+
+/*
 _is_cell_passable = _ScriptMethod(285)  # IsWorldCellPassable
 _is_cell_passable.restype = _buffer  # Boolean, ShortInt  4 bytes
 _is_cell_passable.argtypes = [_ushort,  # CurrX
@@ -3438,14 +3324,14 @@ func GetNextStepZ(CurrX, CurrY, DestX, DestY, WorldNum, CurrZ){
 p.send(senderFunc)
 // return _get_next_step_z(CurrX, CurrY, DestX, DestY, WorldNum, CurrZ)
 }
-_client_hide = _ScriptMethod(368)  # ClientHide
-_client_hide.restype = _bool
-_client_hide.argtypes = [_uint]  # ID
-func ClientHide(ID){
-    p :=
-p.send(senderFunc)
-// return _client_hide(ID)
+*/
+func ClientHide(ID uint32) <-chan bool {
+	p := NewBoolPacket(368, ID)
+	p.send(senderFunc)
+	return p.out
 }
+
+/*
 _get_skill_lock_state = _ScriptMethod(369)  # GetSkillLockState
 _get_skill_lock_state.restype = _byte
 _get_skill_lock_state.argtypes = [_str]  # SkillName

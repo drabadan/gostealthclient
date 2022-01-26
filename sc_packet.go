@@ -273,23 +273,12 @@ func (p *getMultisPacket) transform() {
 	p.out <- r
 }
 
-type getFindListPacket struct {
+type uint32ArrayPacket struct {
 	scCompositePacketData
 	out chan []uint32
 }
 
-func NewGetFindListPacket() *getFindListPacket {
-	p := &getFindListPacket{}
-	p.setSendBytes(SCGetFindedList)
-	p.rb = make(chan []byte)
-	p.out = make(chan []uint32)
-	go receiveByteArray(p.rb)
-	go p.transform()
-
-	return p
-}
-
-func (p *getFindListPacket) transform() {
+func (p *uint32ArrayPacket) transform() {
 	defer close(p.out)
 	b := <-p.rb
 
@@ -307,4 +296,15 @@ func (p *getFindListPacket) transform() {
 	}
 
 	p.out <- r
+}
+
+func NewUint32ArrayPacket(packetNum uint16, args ...interface{}) *uint32ArrayPacket {
+	p := &uint32ArrayPacket{}
+	p.setSendBytes(packetNum, args)
+	p.rb = make(chan []byte)
+	p.out = make(chan []uint32)
+	go receiveByteArray(p.rb)
+	go p.transform()
+
+	return p
 }

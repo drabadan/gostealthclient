@@ -16,7 +16,8 @@ func newComposer() *composer {
 
 func (c *composer) setDatabytes(d []interface{}) {
 	if d != nil {
-		transformData(&c.db, d)
+		e := encoder{}
+		e.transformData(&c.db, d)
 	}
 }
 

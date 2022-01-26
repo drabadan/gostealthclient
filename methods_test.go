@@ -1,6 +1,7 @@
 package gostealthclient_test
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -96,13 +97,24 @@ func TestFindTypesArrayEx(t *testing.T) {
 	})
 }
 
-func TestConnectedTime(t *testing.T) {
-
+func TestGetTooltip(t *testing.T) {
 	s := func() interface{} {
-		return <-sc.ConnectedTime()
+		return <-sc.GetTooltip(<-sc.Backpack())
 	}
 	ans := sc.Bootstrap(s)
-	res, ok := ans.(time.Time)
-	t.Log(res, ok)
+	res, ok := ans.(string)
+	if !ok || !strings.Contains(res, "backpack|Weight") {
+		t.Errorf("Failed to get tooltip, received: %v, want %v", res, "backpack|Weight")
+	}
+}
 
+func TestReadStaticXY(t *testing.T) {
+	s := func() interface{} {
+		return <-sc.ReadStaticsXY(<-sc.GetX(<-sc.Self()), <-sc.GetY(<-sc.Self()), <-sc.WorldNum())
+	}
+	ans := sc.Bootstrap(s)
+	res, ok := ans.([]sc.StaticsXY)
+	if !ok || len(res) == 0 {
+		t.Errorf("Failed to read statics")
+	}
 }

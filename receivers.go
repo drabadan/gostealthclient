@@ -210,9 +210,7 @@ func receiveFloat(r chan float64) {
 
 func readTimeResponse() time.Time {
 	f := readFloatResponse()
-
-	loc, _ := time.LoadLocation("Europe/Berlin")
-	t := time.Date(1899, 12, 30, 00, 00, 00, 00, loc)
+	t := time.Date(1899, 12, 30, 00, 00, 00, 00, time.Local)
 
 	d, _ := math.Modf(f)
 
