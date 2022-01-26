@@ -10,3 +10,8 @@ type Multi struct {
 	X, Y, XMax, XMin, YMax, YMin, Width, Height uint16
 	Z                                           byte
 }
+
+type WorldCellPassable struct {
+	Passable bool
+	Z        int8
+}

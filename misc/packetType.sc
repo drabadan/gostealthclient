@@ -386,6 +386,10 @@ namespace StealthSharp.Enumeration
         SCBookSetPageText = 375,
         SCBookClearText = 376,
         SCBookSetHeader = 377,
+        SCGetNowUnix = 378;
+        SCGetNow = 379;
+        SCSetScriptName = 380;
+        SCGetScriptParams = 381;
 //new mothods add HERE ^^^
 
 

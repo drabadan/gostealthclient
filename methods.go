@@ -3,6 +3,7 @@ package gostealthclient
 import (
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -900,8 +901,8 @@ func GetY(oid uint32) <-chan uint16 {
 	return p.out
 }
 
-func GetZ(oid uint32) <-chan byte {
-	p := NewBytePacket(SCGetZ, oid)
+func GetZ(oid uint32) <-chan int8 {
+	p := NewInt8Packet(SCGetZ, oid)
 	p.send(senderFunc)
 	return p.out
 }
@@ -2607,12 +2608,14 @@ _is_cell_passable.argtypes = [_ushort,  # CurrX
                               _ushort,  # DestX
                               _ushort,  # DestY
                               _ubyte]  # WorldNum
-func IsWorldCellPassable(CurrX, CurrY, CurrZ, DestX, DestY, WorldNum){
-    data = _is_cell_passable(CurrX, CurrY, CurrZ, DestX, DestY, WorldNum)
+*/
+func IsWorldCellPassable(currX, currY uint16, currZ int8, destX, destY uint16, worldNum byte) <-chan WorldCellPassable {
+	p := NewIsWorldCellPassablePacket(currX, currY, currZ, destX, destY, worldNum)
+	p.send(senderFunc)
+	return p.out
 }
-    p :=
-p.send(senderFunc)
-// return _struct.unpack('<?b', data)
+
+/*
 _get_statics_array = _ScriptMethod(286)  # GetStaticTilesArray
 _get_statics_array.restype = _buffer  # Array of TFoundTile
 _get_statics_array.argtypes = [_ushort,  # Xmin
@@ -2667,15 +2670,12 @@ func ClientPrint(text string) {
 	p.send(senderFunc)
 }
 
-/*
-_client_print_ex = _ScriptMethod(290)  # ClientPrintEx
-_client_print_ex.argtypes = [_uint,  # SenderID
-                             _ushort,  # Color
-                             _ushort,  # Font
-                             _str]  # Text
-func ClientPrintEx(SenderID, Color, Font, Text){
-    _client_print_ex(SenderID, Color, Font, Text)
+func ClientPrintEx(senderID uint32, color, font uint16, text string) {
+	p := NewVoidPacket(SCClientPrintEx, senderID, color, font, text)
+	p.send(senderFunc)
 }
+
+/*
 _wnd = {0: 0, '0': 0, 'wtpaperdoll': 0, 'paperdoll': 0,
         1: 1, '1': 1, 'wtstatus': 1, 'status': 1,
         2: 2, '2': 2, 'wtcharprofile': 2, 'charprofile': 2, 'profile': 2,
@@ -2696,15 +2696,12 @@ func ClientRequestObjectTarget() {
 	p.send(senderFunc)
 }
 
-/*
- */
 func ClientRequestTileTarget() {
 	p := NewVoidPacket(293)
 	p.send(senderFunc)
 }
 
-/*
- */func ClientTargetResponsePresent() <-chan bool {
+func ClientTargetResponsePresent() <-chan bool {
 	p := NewBoolPacket(294)
 	p.send(senderFunc)
 	return p.out
@@ -2734,6 +2731,7 @@ func WaitForClientTargetResponse(MaxWaitTimeMS){
 _check_lag_begin = _ScriptMethod(297)  # CheckLagBegin
 _check_lag_end = _ScriptMethod(298)  # CheckLagEnd
 */
+
 func CheckLag(timeoutMS uint32) <-chan bool {
 	p := NewBoolPacket(299, timeoutMS)
 	p.send(senderFunc)
@@ -2765,46 +2763,41 @@ func GetSilentMode() <-chan bool {
 	return p.out
 }
 
-/*
- */
 func ClearInfoWindow() {
 	p := NewVoidPacket(348)
 	p.send(senderFunc)
 }
 
-/*
-_set_silent_mode = _ScriptMethod(301)  # SetSilentMode
-_set_silent_mode.argtypes = [_bool]  # Value
-func SetSilentMode(Value){
-    _set_silent_mode(Value)
+func SetSilentMode(value bool) {
+	p := NewVoidPacket(SCSetSilentMode, value)
+	p.send(senderFunc)
 }
-*/
+
 func FillNewWindow(s string) {
 	p := NewVoidPacket(303, s)
 	p.send(senderFunc)
 }
 
-/*
- */
 func StealthPath() <-chan string {
 	p := NewStringPacket(305)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
-func CurrentScriptPath(){
-    return __file__
+func CurrentScriptPath() string {
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	return filepath.Dir(ex)
 }
-*/
+
 func GetStealthProfilePath() <-chan string {
 	p := NewStringPacket(306)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
- */
 func GetShardPath() <-chan string {
 	p := NewStringPacket(307)
 	p.send(senderFunc)
@@ -2816,20 +2809,26 @@ _step = _ScriptMethod(324)  # Step
 _step.restype = _ubyte
 _step.argtypes = [_ubyte,  # Direction
                   _bool]  # Running
-func Step(Direction, Running=False){
-    p :=
-p.send(senderFunc)
-// return _step(Direction, Running)
+*/
+func Step(direction byte, running bool) <-chan byte {
+	p := NewBytePacket(SCStep, direction, running)
+	p.send(senderFunc)
+	return p.out
 }
+
+/*
 _step_q = _ScriptMethod(325)  # StepQ
 _step_q.restype = _int
 _step_q.argtypes = [_ubyte,  # Direction
                     _bool]  # Running
-func StepQ(Direction, Running){
-    p :=
-p.send(senderFunc)
-// return _step_q(Direction, Running)
+*/
+func StepQ(direction byte, running bool) <-chan int32 {
+	p := NewIntPacket(SCStepQ, direction, running)
+	p.send(senderFunc)
+	return p.out
 }
+
+/*
 _move_xyz = _ScriptMethod(326)  # MoveXYZ
 _move_xyz.restype = _bool
 _move_xyz.argtypes = [_ushort,  # Xdst

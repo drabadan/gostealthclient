@@ -98,7 +98,7 @@ func readUint16Response() uint16 {
 func receiveUint16(r chan (uint16)) {
 	defer close(r)
 
-	time.Sleep(time.Millisecond * 50)
+	time.Sleep(READ_DELAY)
 	r <- readUint16Response()
 }
 
@@ -110,7 +110,7 @@ func readUint32Response() uint32 {
 func receiveUint32(r chan (uint32)) {
 	defer close(r)
 
-	time.Sleep(time.Millisecond * 50)
+	time.Sleep(READ_DELAY)
 	r <- readUint32Response()
 }
 
@@ -124,6 +124,17 @@ func receiveBool(r chan bool) {
 
 	time.Sleep(READ_DELAY)
 	r <- readBool()
+}
+
+func readInt8() int8 {
+	replyBuf := receiverFunc(readReplySize(), BODY_READ_TYPE)
+	return int8(replyBuf[4])
+}
+
+func receiveInt8(r chan int8) {
+	defer close(r)
+	time.Sleep(READ_DELAY)
+	r <- readInt8()
 }
 
 func readInt() int32 {

@@ -106,6 +106,19 @@ func NewBoolPacket(packetNum uint16, args ...interface{}) *boolPacket {
 	return p
 }
 
+type int8Packet struct {
+	scPacketData
+	out chan int8
+}
+
+func NewInt8Packet(packetNum uint16, args ...interface{}) *int8Packet {
+	p := &int8Packet{}
+	p.setSendBytes(packetNum, args...)
+	p.out = make(chan int8)
+	go receiveInt8(p.out)
+	return p
+}
+
 type intPacket struct {
 	scPacketData
 	out chan int32
@@ -306,5 +319,31 @@ func NewUint32ArrayPacket(packetNum uint16, args ...interface{}) *uint32ArrayPac
 	go receiveByteArray(p.rb)
 	go p.transform()
 
+	return p
+}
+
+type isWorldCellPassablePacket struct {
+	scCompositePacketData
+	out chan WorldCellPassable
+}
+
+func (p *isWorldCellPassablePacket) transform() {
+	defer close(p.out)
+	b := <-p.rb
+	r := WorldCellPassable{
+		Passable: b[4] == 0x1,
+		Z:        int8(b[5]),
+	}
+
+	p.out <- r
+}
+
+func NewIsWorldCellPassablePacket(args ...interface{}) *isWorldCellPassablePacket {
+	p := &isWorldCellPassablePacket{}
+	p.setSendBytes(SCIsWorldCellPassable, args...)
+	p.rb = make(chan []byte)
+	p.out = make(chan WorldCellPassable)
+	go receiveByteArray(p.rb)
+	go p.transform()
 	return p
 }

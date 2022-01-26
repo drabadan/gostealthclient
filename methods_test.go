@@ -118,3 +118,38 @@ func TestReadStaticXY(t *testing.T) {
 		t.Errorf("Failed to read statics")
 	}
 }
+
+func TestIsWorldCellPassablePacket(t *testing.T) {
+	s := func() interface{} {
+		x, y := <-sc.GetX(<-sc.Self()), <-sc.GetY(<-sc.Self())
+		z := <-sc.GetZ(<-sc.Self())
+		return <-sc.IsWorldCellPassable(
+			x,
+			y,
+			z,
+			2547,
+			535,
+			<-sc.WorldNum(),
+		)
+	}
+
+	ans := sc.Bootstrap(s)
+	res, ok := ans.(sc.WorldCellPassable)
+
+	if !ok || res.Passable || res.Z != 0 {
+		t.Errorf("Failed to resolve TestIsWorldCellPassablePacket %v res.", res)
+	}
+}
+
+func TestGetZ(t *testing.T) {
+	s := func() interface{} {
+		return <-sc.GetZ(<-sc.Self())
+	}
+
+	ans := sc.Bootstrap(s)
+	res, ok := ans.(int8)
+
+	if !ok || res != 0 {
+		t.Error(res, ok)
+	}
+}
