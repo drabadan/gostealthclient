@@ -235,9 +235,6 @@ func Backpack() <-chan uint32 {
 	p.send(senderFunc)
 	return p.out
 }
-func Ground() byte {
-	return 0
-}
 func Str() <-chan uint32 {
 	p := NewUint32Packet(49)
 	p.send(senderFunc)
@@ -1186,50 +1183,49 @@ func SetDropDelay(Value uint32) {
 	p.send(senderFunc)
 }
 
+func DragItem(oid uint32, count int32) <-chan bool {
+	p := NewBoolPacket(SCDragItem, oid, count)
+	p.send(senderFunc)
+	return p.out
+}
+
+func DropItem(container uint32, x, y, z int32) <-chan bool {
+	p := NewBoolPacket(SCDropItem, container, x, y, z)
+	p.send(senderFunc)
+	return p.out
+}
+
+func MoveItem(itemID uint32, count int32, container uint32, x, y, z int32) <-chan bool {
+	r := make(chan bool)
+	go func() {
+		if !<-DragItem(itemID, count) {
+			r <- false
+		}
+
+		time.Sleep(time.Millisecond * 100)
+
+		r <- <-DropItem(container, x, y, z)
+	}()
+	return r
+}
+
+func Grab(oid uint32, count int32) <-chan bool {
+	return MoveItem(oid, count, <-Backpack(), 0, 0, 0)
+}
+
+func Drop(oid uint32, count, x, y, z int32) <-chan bool {
+	return MoveItem(oid, count, Ground(), x, y, z)
+}
+
+func Ground() uint32 {
+	return 0
+}
+
+func DropHere(oid uint32) <-chan bool {
+	return MoveItem(oid, 0, Ground(), 0, 0, 0)
+}
+
 /*
-_drag_item = _ScriptMethod(191)  # DragItem
-_drag_item.restype = _bool
-_drag_item.argtypes = [_uint,  # ItemID
-                       _int]  # Count
-func DragItem(ItemID, Count){
-    p :=
-p.send(senderFunc)
-// return _drag_item(ItemID, Count)
-}
-_drop_item = _ScriptMethod(192)  # DropItem
-_drop_item.restype = _bool
-_drop_item.argtypes = [_uint,  # MoveIntoID
-                       _int,  # X
-                       _int,  # Y
-                       _int]  # Z
-func DropItem(MoveIntoID, X, Y, Z){
-    p :=
-p.send(senderFunc)
-// return _drop_item(MoveIntoID, X, Y, Z)
-}
-func MoveItem(ItemID, Count, MoveIntoID, X, Y, Z){
-    if not DragItem(ItemID, Count):
-}
-        return False
-    Wait(100)
-    p :=
-p.send(senderFunc)
-// return DropItem(MoveIntoID, X, Y, Z)
-func Grab(ItemID, Count){
-    p :=
-p.send(senderFunc)
-// return MoveItem(ItemID, Count, Backpack(), 0, 0, 0)
-}
-func Drop(ItemID, Count, X, Y, Z){
-    p :=
-p.send(senderFunc)
-// return MoveItem(ItemID, Count, Ground(), X, Y, Z)
-}
-func DropHere(ItemID){
-    p :=
-p.send(senderFunc)
-// return MoveItem(ItemID, 0, Ground(), 0, 0, 0)
-}
 def MoveItems(Container, ItemsType, ItemsColor, MoveIntoID, X, Y, Z,
               DelayMS, MaxCount=0):
     FindTypeEx(ItemsType, ItemsColor, Container, False)
@@ -1262,9 +1258,13 @@ func RequestContextMenu(ID uint32) {
 _wait_context_menu = _ScriptMethod(194)  # SetContextMenuHook
 _wait_context_menu.argtypes = [_uint,  # MenuID
                                _ubyte]  # EntryNumber
-func SetContextMenuHook(MenuID, EntryNumber){
-    _wait_context_menu(MenuID, EntryNumber)
+*/
+func SetContextMenuHook(menuID uint32, entryNumber byte) {
+	p := NewVoidPacket(SCSetContextMenuHook, menuID, entryNumber)
+	p.send(senderFunc)
 }
+
+/*
 _get_context_menu = _ScriptMethod(195)  # GetContextMenu
 _get_context_menu.restype = _buffer
 func GetContextMenu(){
