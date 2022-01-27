@@ -95,6 +95,14 @@ func (e *encoder) encodeInt8(data int8, dataBytes *[]byte) {
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
 
+func (e *encoder) encodeInt16(data int16, dataBytes *[]byte) {
+	buf := new(bytes.Buffer)
+	r := make([]int16, 0)
+	r = append(r, int16(data))
+	binary.Write(buf, binary.LittleEndian, r)
+	*dataBytes = append(*dataBytes, buf.Bytes()...)
+}
+
 func (e *encoder) transformType(dataBytes *[]byte, v interface{}) {
 	if v != nil {
 		if str, ok := v.(string); ok {
@@ -113,6 +121,8 @@ func (e *encoder) transformType(dataBytes *[]byte, v interface{}) {
 			e.encodeTime(t, dataBytes)
 		} else if i8, ok := v.(int8); ok {
 			e.encodeInt8(i8, dataBytes)
+		} else if i16, ok := v.(int16); ok {
+			e.encodeInt16(i16, dataBytes)
 		} else {
 			log.Fatalf("Failed to parse argument of type %v", fmt.Sprintf("%T", v))
 			os.Exit(500)

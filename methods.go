@@ -185,46 +185,38 @@ func LastObject() <-chan uint32 {
 	p := NewUint32Packet(44)
 	p.send(senderFunc)
 	return p.out
-} /*
-_get_buff_bar_info = _ScriptMethod(349)  # GetBuffBarInfo
-_get_buff_bar_info.restype = _buffer  # TBuffBarInfo
-func GetBuffBarInfo(){
-    result = []
 }
-    fmt = '<HdHII'
-    size = _struct.calcsize(fmt)
-    keys = ('Attribute_ID', 'TimeStart', 'Seconds', 'ClilocID1', 'ClilocID2')
-    data = _get_buff_bar_info()
-    if b'' == '':  # py2
-        data = bytes(data)
-    count = _uint.from_buffer(data)
-    data = data[4:]
-    for i in range(count):
-        values = _struct.unpack(fmt, data[i * size:i * size + size])
-        buff = dict(zip(keys, values))
-        buff['TimeStart'] = _ddt2pdt(buff['TimeStart'])
-        result.append(buff)
-    return result*/
+
+func GetBuffBarInfo() <-chan BuffBarInfo {
+	p := NewBuffBarInfo()
+	p.send(senderFunc)
+	return p.out
+}
+
 func ShardName() <-chan string {
 	p := NewStringPacket(47)
 	p.send(senderFunc)
 	return p.out
 }
+
 func ProfileShardName() <-chan string {
 	p := NewStringPacket(343)
 	p.send(senderFunc)
 	return p.out
 }
+
 func ProxyIP() <-chan string {
 	p := NewStringPacket(60)
 	p.send(senderFunc)
 	return p.out
 }
+
 func ProxyPort() <-chan uint16 {
 	p := NewUint16Packet(SCGetProxyPort)
 	p.send(senderFunc)
 	return p.out
 }
+
 func UseProxy() <-chan bool {
 	p := NewBoolPacket(62)
 	p.send(senderFunc)
@@ -235,86 +227,81 @@ func Backpack() <-chan uint32 {
 	p.send(senderFunc)
 	return p.out
 }
+
 func Str() <-chan uint32 {
 	p := NewUint32Packet(49)
 	p.send(senderFunc)
 	return p.out
 }
+
 func Int() <-chan uint32 {
 	p := NewUint32Packet(50)
 	p.send(senderFunc)
 	return p.out
 }
+
 func Dex() <-chan uint32 {
 	p := NewUint32Packet(51)
 	p.send(senderFunc)
 	return p.out
 }
+
 func Life() <-chan uint32 {
 	p := NewUint32Packet(52)
 	p.send(senderFunc)
 	return p.out
 }
+
 func HP() <-chan uint32 {
 	return Life()
 }
+
 func Mana() <-chan uint32 {
 	p := NewUint32Packet(53)
 	p.send(senderFunc)
 	return p.out
 }
+
 func Stam() <-chan uint32 {
 	p := NewUint32Packet(54)
 	p.send(senderFunc)
 	return p.out
 }
+
 func MaxLife() <-chan uint32 {
 	p := NewUint32Packet(55)
 	p.send(senderFunc)
 	return p.out
 }
+
 func MaxHP() <-chan uint32 {
 	return MaxLife()
 }
+
 func MaxMana() <-chan uint32 {
 	p := NewUint32Packet(56)
 	p.send(senderFunc)
 	return p.out
 }
+
 func MaxStam() <-chan uint32 {
 	p := NewUint32Packet(57)
 	p.send(senderFunc)
 	return p.out
 }
+
 func Luck() <-chan uint16 {
 	p := NewUint16Packet(SCGetSelfLuck)
 	p.send(senderFunc)
 	return p.out
-} /*
-_get_extended_info = _ScriptMethod(59)  # GetExtInfo
-_get_extended_info.restype = _buffer  # TExtendedInfo
-func GetExtInfo(){
-    keys = ('MaxWeight', 'Race', 'StatCap', 'PetsCurrent', 'PetsMax',
 }
-            'FireResist', 'ColdResist', 'PoisonResist', 'EnergyResist',
-            'Luck', 'DamageMin', 'DamageMax', 'Tithing_points',
-            'ArmorMax', 'fireresistMax', 'coldresistMax',
-            'poisonresistMax', 'energyresistMax', 'DefenseChance',
-            'DefensceChanceMax', 'Hit_Chance_Incr', 'Damage_Incr',
-            'Swing_Speed_Incr', 'Lower_Reagent_Cost', 'Spell_Damage_Incr',
-            'Faster_Cast_Recovery', 'Faster_Casting', 'Lower_Mana_Cost',
-            'HP_Regen', 'Stam_Regen', 'Mana_Regen', 'Reflect_Phys_Damage',
-            'Enhance_Potions', 'Strength_Incr', 'Dex_Incr', 'Int_Incr',
-            'HP_Incr', 'Mana_Incr')
-    fmt = '<HBH2B4Hh2Hi26H'
-    data = _get_extended_info()
-    if b'' == '':  # py2
-        data = bytes(data)
-    values = _struct.unpack(fmt, data)
-    p :=
-p.send(senderFunc)
-// return dict(zip(keys, values))
-*/
+
+func GetExtInfo() <-chan ExtendedInfo {
+	p := NewGetExtInfoPacket()
+	p.send(senderFunc)
+	return p.out
+}
+
 func Hidden() <-chan bool {
 	p := NewBoolPacket(63)
 	p.send(senderFunc)
@@ -1225,40 +1212,44 @@ func DropHere(oid uint32) <-chan bool {
 	return MoveItem(oid, 0, Ground(), 0, 0, 0)
 }
 
-/*
-def MoveItems(Container, ItemsType, ItemsColor, MoveIntoID, X, Y, Z,
-              DelayMS, MaxCount=0):
-    FindTypeEx(ItemsType, ItemsColor, Container, False)
-    items = GetFoundList()
-    if not items:  # nothing found
-        return False
-    drop_delay = GetDropDelay()
-    if not 50 <= drop_delay <= 10000:
-        drop_delay = 50 if drop_delay < 50 else 10000
-    if drop_delay > DelayMS:
-        DelayMS = 0
-    SetDropDelay(drop_delay)
-    if not 0 < MaxCount < len(items):
-        MaxCount = len(items)
-    for i in range(MaxCount):
-        MoveItem(items[i], 0, MoveIntoID, X, Y, Z)
-        Wait(DelayMS)
-    return True
-func EmptyContainer(Container, DestContainer, delay_ms){
-    return MoveItems(Container, -1, -1, DestContainer,
+func MoveItems(container uint32,
+	itemsType, itemsColor uint16,
+	moveIntoID uint32,
+	x, y, z int32,
+	delayMS uint32,
+	// Count of stacks not the total quantity to move
+	maxCount int) <-chan bool {
+	r := make(chan bool)
+	go func() {
+		<-FindTypeEx(itemsType, itemsColor, container, false)
+		items := <-GetFoundList()
+
+		if len(items) > 0 {
+			if maxCount == 0 {
+				maxCount = len(items)
+			}
+
+			for i := 0; i < maxCount; i++ {
+				MoveItem(items[i], 0, moveIntoID, x, y, z)
+				time.Sleep(time.Millisecond * time.Duration(delayMS))
+			}
+		}
+
+		r <- true
+	}()
+
+	return r
 }
-                     0xFFFF, 0xFFFF, 0, delay_ms)
-*/
+
+func EmptyContainer(container, destContainer, delayMs uint32) <-chan bool {
+	return MoveItems(container, 0xffff, 0xffff, destContainer, 0, 0, 0, delayMs, 0)
+}
+
 func RequestContextMenu(ID uint32) {
 	p := NewVoidPacket(193, ID)
 	p.send(senderFunc)
 }
 
-/*
-_wait_context_menu = _ScriptMethod(194)  # SetContextMenuHook
-_wait_context_menu.argtypes = [_uint,  # MenuID
-                               _ubyte]  # EntryNumber
-*/
 func SetContextMenuHook(menuID uint32, entryNumber byte) {
 	p := NewVoidPacket(SCSetContextMenuHook, menuID, entryNumber)
 	p.send(senderFunc)
@@ -1306,72 +1297,58 @@ func IsTrade() <-chan bool {
 	return p.out
 }
 
-/*
-_get_trade_container_serial = _ScriptMethod(198)  # GetTradeContainer
-_get_trade_container_serial.restype = _uint
-_get_trade_container_serial.argtypes = [_ubyte,  # TradeNum
-                                        _ubyte]  # Num
-func GetTradeContainer(TradeNum, Num){
-    p :=
-p.send(senderFunc)
-// return _get_trade_container_serial(TradeNum, Num)
+func GetTradeContainer(tradeNum, num byte) <-chan uint32 {
+	p := NewUint32Packet(SCGetTradeContainer, tradeNum, num)
+	p.send(senderFunc)
+	return p.out
+
 }
-_get_trade_opponent_serial = _ScriptMethod(199)  # GetTradeOpponent
-_get_trade_opponent_serial.restype = _uint
-_get_trade_opponent_serial.argtypes = [_ubyte]  # TradeNum
-func GetTradeOpponent(TradeNum){
-    p :=
-p.send(senderFunc)
-// return _get_trade_opponent_serial(TradeNum)
+
+func GetTradeOpponent(tradeNum byte) <-chan uint32 {
+	p := NewUint32Packet(SCGetTradeOpponent, tradeNum)
+	p.send(senderFunc)
+	return p.out
 }
-_get_trades_count = _ScriptMethod(200)  # GetTradeCount
-_get_trades_count.restype = _ubyte
-func TradeCount(){
-    return _get_trades_count()
+
+func TradeCount() <-chan byte {
+	p := NewBytePacket(SCGetTradeCount)
+	p.send(senderFunc)
+	return p.out
 }
-_get_trade_opponent_name = _ScriptMethod(201)  # GetTradeOpponentName
-_get_trade_opponent_name.restype = _str
-_get_trade_opponent_name.argtypes = [_ubyte]  # TradeNum
-func GetTradeOpponentName(TradeNum){
-    p :=
-p.send(senderFunc)
-// return _get_trade_opponent_name(TradeNum)
+
+func GetTradeOpponentName(tradeNum byte) <-chan string {
+	p := NewStringPacket(SCGetTradeOpponentName, tradeNum)
+	p.send(senderFunc)
+	return p.out
 }
-_get_trade_state = _ScriptMethod(202)  # TradeCheck
-_get_trade_state.restype = _bool
-_get_trade_state.argtypes = [_ubyte,  # TradeNum
-                             _ubyte]  # Num
-func TradeCheck(TradeNum, Num){
-    p :=
-p.send(senderFunc)
-// return _get_trade_state(TradeNum, Num)
+
+func TradeCheck(tradeNum, num byte) <-chan bool {
+	p := NewBoolPacket(SCTradeCheck, tradeNum, num)
+	p.send(senderFunc)
+	return p.out
 }
-_confirm_trade = _ScriptMethod(203)  # ConfirmTrade
-_confirm_trade.argtypes = [_ubyte]  # TradeNum
-func ConfirmTrade(TradeNum){
-    _confirm_trade(TradeNum)
+
+func ConfirmTrade(tradeNum byte) {
+	p := NewVoidPacket(SCConfirmTrade, tradeNum)
+	p.send(senderFunc)
 }
-_cancel_trade = _ScriptMethod(204)  # CancelTrade
-_cancel_trade.restype = _bool
-_cancel_trade.argtypes = [_ubyte]  # TradeNum
-func CancelTrade(TradeNum){
-    p :=
-p.send(senderFunc)
-// return _cancel_trade(TradeNum)
+
+func CancelTrade(tradeNum byte) <-chan bool {
+	p := NewBoolPacket(SCCancelTrade, tradeNum)
+	p.send(senderFunc)
+	return p.out
 }
-_wait_menu = _ScriptMethod(205)  # WaitMenu
-_wait_menu.argtypes = [_str,  # MenuCaption
-                       _str]  # ElementCaption
-func WaitMenu(MenuCaption, ElementCaption){
-    _wait_menu(MenuCaption, ElementCaption)
+
+func WaitMenu(menuCaption, elementCaption string) {
+	p := NewVoidPacket(SCWaitMenu, menuCaption, elementCaption)
+	p.send(senderFunc)
 }
-_auto_menu = _ScriptMethod(206)  # AutoMenu
-_auto_menu.argtypes = [_str,  # MenuCaption
-                       _str]  # ElementCaption
-func AutoMenu(MenuCaption, ElementCaption){
-    _auto_menu(MenuCaption, ElementCaption)
+
+func AutoMenu(menuCaption, elementCaption string) {
+	p := NewVoidPacket(SCAutoMenu, menuCaption, elementCaption)
+	p.send(senderFunc)
 }
-*/
+
 func MenuHookPresent() <-chan bool {
 	p := NewBoolPacket(207)
 	p.send(senderFunc)

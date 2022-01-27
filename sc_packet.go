@@ -3,7 +3,10 @@ package gostealthclient
 import (
 	"encoding/binary"
 	"log"
+	"os"
 	"time"
+
+	"github.com/ghostiam/binstruct"
 )
 
 type scPacketData struct {
@@ -368,6 +371,78 @@ func NewPoint2DPacket(packetNum uint16, args ...interface{}) *scPoint2DPacket {
 	p.setSendBytes(packetNum, args...)
 	p.rb = make(chan []byte)
 	p.out = make(chan Point2D)
+	go receiveByteArray(p.rb)
+	go p.transform()
+	return p
+}
+
+type scGetBuffBarInfoPacket struct {
+	scCompositePacketData
+	out chan BuffBarInfo
+}
+
+func (p *scGetBuffBarInfoPacket) transform() {
+	defer close(p.out)
+	b := <-p.rb
+	count := int(binary.LittleEndian.Uint16(b[4:8]))
+	r := BuffBarInfo{
+		Count: byte(count),
+	}
+	r.Buffs = make([]BuffIcon, 0)
+
+	size := 20
+
+	wb := b[8:]
+
+	for i := 0; i < count; i++ {
+		offset := i * size
+		a := BuffIcon{
+			Attribute_ID: binary.LittleEndian.Uint16(wb[offset : offset+2]),
+			TimeStart:    decodeDelphiTime(Float64frombytes(wb[offset+2 : offset+10])),
+			Seconds:      binary.LittleEndian.Uint16(wb[offset+10 : offset+12]),
+			ClilocID1:    binary.LittleEndian.Uint32(wb[offset+12 : offset+16]),
+			ClilocID2:    binary.LittleEndian.Uint32(wb[offset+16 : offset+20]),
+		}
+		r.Buffs = append(r.Buffs, a)
+	}
+
+	p.out <- r
+}
+
+func NewBuffBarInfo() *scGetBuffBarInfoPacket {
+	p := &scGetBuffBarInfoPacket{}
+	p.setSendBytes(SCGetBuffBarInfo)
+	p.rb = make(chan []byte)
+	p.out = make(chan BuffBarInfo)
+	go receiveByteArray(p.rb)
+	go p.transform()
+	return p
+}
+
+type scGetExtInfoPacket struct {
+	scCompositePacketData
+	out chan ExtendedInfo
+}
+
+func (p *scGetExtInfoPacket) transform() {
+	defer close(p.out)
+	b := <-p.rb
+
+	var ei ExtendedInfo
+	err := binstruct.UnmarshalLE(b[4:], &ei)
+
+	if err != nil {
+		log.Fatalf("Failed to parse Ext info! Exiting...")
+		os.Exit(500)
+	}
+	p.out <- ei
+}
+
+func NewGetExtInfoPacket() *scGetExtInfoPacket {
+	p := &scGetExtInfoPacket{}
+	p.setSendBytes(SCGetExtInfo)
+	p.rb = make(chan []byte)
+	p.out = make(chan ExtendedInfo)
 	go receiveByteArray(p.rb)
 	go p.transform()
 	return p

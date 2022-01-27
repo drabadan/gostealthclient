@@ -153,3 +153,30 @@ func TestGetZ(t *testing.T) {
 		t.Error(res, ok)
 	}
 }
+
+func TestBuffBarInfo(t *testing.T) {
+	s := func() interface{} {
+		sc.CastToObj("Agility", <-sc.Self())
+		time.Sleep(time.Second * 3)
+		return <-sc.GetBuffBarInfo()
+	}
+
+	ans := sc.Bootstrap(s)
+	res, ok := ans.(sc.BuffBarInfo)
+	if !ok || res.Count < 1 {
+		t.Errorf("Failed to get buffbar, or char didn't cast Agility. Res: %v", res)
+	}
+}
+
+func TestExtInfo(t *testing.T) {
+	s := func() interface{} {
+		return <-sc.GetExtInfo()
+	}
+	ans := sc.Bootstrap(s)
+	res, ok := ans.(sc.ExtendedInfo)
+
+	if !ok || res.MaxWeight == 0 {
+		t.Errorf("Failed to resolve Ext info. %v", res)
+	}
+
+}

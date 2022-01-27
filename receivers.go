@@ -34,6 +34,10 @@ func defaultReceiver(conn *net.TCPConn, mws *[]func(readBuff []byte) []byte) fun
 		}
 
 		if rtype == BODY_READ_TYPE {
+			if debug {
+				log.Printf("Received body: % x", readBuff)
+			}
+
 			responsesLog = append(responsesLog, readBuff)
 			t := binary.LittleEndian.Uint16(readBuff[0:2])
 			switch t {
@@ -199,12 +203,6 @@ func receiveByteArray(r chan []byte) {
 	defer close(r)
 	time.Sleep(READ_DELAY)
 	r <- readByteArrayResponse()
-}
-
-func Float64frombytes(bytes []byte) float64 {
-	bits := binary.LittleEndian.Uint64(bytes)
-	float := math.Float64frombits(bits)
-	return float
 }
 
 func readFloatResponse() float64 {

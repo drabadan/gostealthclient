@@ -412,7 +412,7 @@ const (
 	SCClearFigures = 553
 )
 
-var _SPELLS = map[string]uint16{
+var _SPELLS = map[string]int32{
 	// # 1st circle
 	"clumsy":         1,
 	"create food":    2,
