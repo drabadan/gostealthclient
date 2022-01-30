@@ -1,2 +1,7 @@
-client.exe
+*.exe
+*.exe~
+*.dll
 .vscode/
+*.test
+*.out
+vendor/

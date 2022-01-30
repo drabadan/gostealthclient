@@ -1417,84 +1417,62 @@ func GetLastMenuItems(){
 p.send(senderFunc)
 // return '\n'.join(GetLastMenu())
 }
-_wait_gump = _ScriptMethod(211)  # WaitGumpInt
-_wait_gump.argtypes = [_int]  # Value
-func WaitGump(Value){
-    _wait_gump(int(Value))
-}
 */
+
+func WaitGump(value int32) {
+	p := NewVoidPacket(SCWaitGumpInt, value)
+	p.send(senderFunc)
+}
+
 func WaitTextEntry(value string) {
 	p := NewVoidPacket(212, value)
 	p.send(senderFunc)
 }
 
-/*
-_auto_text_entry = _ScriptMethod(213)  # GumpAutoTextEntry
-_auto_text_entry.argtypes = [_int,  # TextEntryID
-                             _str]  # Value
-func GumpAutoTextEntry(TextEntryID, Value){
-    _auto_text_entry(TextEntryID, Value)
+func GumpAutoTextEntry(textEntryID int32, value string) {
+	p := NewVoidPacket(SCGumpAutoTextEntry, textEntryID, value)
+	p.send(senderFunc)
 }
-_auto_radiobutton = _ScriptMethod(214)  # GumpAutoRadiobutton
-_auto_radiobutton.argtypes = [_int,  # RadiobuttonID
-                              _int]  # Value
-func GumpAutoRadiobutton(RadiobuttonID, Value){
-    _auto_radiobutton(RadiobuttonID, Value)
+
+func GumpAutoRadiobutton(radiobuttonID, value int32) {
+	p := NewVoidPacket(SCGumpAutoRadiobutton, radiobuttonID, value)
+	p.send(senderFunc)
 }
-_auto_checkbox = _ScriptMethod(215)  # GumpAutoCheckBox
-_auto_checkbox.argtypes = [_int,  # CBID
-                           _int]  # Value
-func GumpAutoCheckBox(CBID, Value){
-    _auto_checkbox(CBID, Value)
+
+func GumpAutoCheckBox(checkBoxID, value int32) {
+	p := NewVoidPacket(SCGumpAutoCheckBox, checkBoxID, value)
+	p.send(senderFunc)
 }
-_send_gump_button = _ScriptMethod(216)  # NumGumpButton
-_send_gump_button.restype = _bool
-_send_gump_button.argtypes = [_ushort,  # GumpIndex
-                              _int]  # Value
-func NumGumpButton(GumpIndex, Value){
-    p :=
-p.send(senderFunc)
-// return _send_gump_button(GumpIndex, Value)
+
+func NumGumpButton(gumpIndex uint16, value int32) <-chan bool {
+	p := NewBoolPacket(SCNumGumpButton, gumpIndex, value)
+	p.send(senderFunc)
+	return p.out
 }
-_send_gump_text_entry = _ScriptMethod(217)  # NumGumpTextEntry
-_send_gump_text_entry.restype = _bool
-_send_gump_text_entry.argtypes = [_ushort,  # GumpIndex
-                                  _int,  # TextEntryID
-                                  _str]  # Value
-func NumGumpTextEntry(GumpIndex, TextEntryID, Value){
-    p :=
-p.send(senderFunc)
-// return _send_gump_text_entry(GumpIndex, TextEntryID, Value)
+
+func NumGumpTextEntry(gumpIndex uint16, textEntryID int32, value string) <-chan bool {
+	p := NewBoolPacket(SCNumGumpTextEntry, gumpIndex, textEntryID, value)
+	p.send(senderFunc)
+	return p.out
 }
-_send_gump_radiobutton = _ScriptMethod(218)  # NumGumpRadiobutton
-_send_gump_radiobutton.restype = _bool
-_send_gump_radiobutton.argtypes = [_ushort,  # GumpIndex
-                                   _int,  # RadiobuttonID
-                                   _int]  # Value
-func NumGumpRadiobutton(GumpIndex, RadiobuttonID, Value){
-    p :=
-p.send(senderFunc)
-// return _send_gump_radiobutton(GumpIndex, RadiobuttonID, Value)
+
+func NumGumpRadiobutton(gumpIndex uint16, radiobuttonID, value int32) <-chan bool {
+	p := NewBoolPacket(SCNumGumpRadiobutton, gumpIndex, radiobuttonID, value)
+	p.send(senderFunc)
+	return p.out
 }
-_send_gump_checkbox = _ScriptMethod(219)  # NumGumpCheckBox
-_send_gump_checkbox.restype = _bool
-_send_gump_checkbox.argtypes = [_ushort,  # GumpIndex
-                                _int,  # CBID
-                                _int]  # Value
-func NumGumpCheckBox(GumpIndex, CBID, Value){
-    p :=
-p.send(senderFunc)
-// return _send_gump_checkbox(GumpIndex, CBID, Value)
+func NumGumpCheckBox(gumpIndex uint16, checkBoxID, value int32) <-chan bool {
+	p := NewBoolPacket(SCNumGumpCheckBox, gumpIndex, checkBoxID, value)
+	p.send(senderFunc)
+	return p.out
 }
-*/
+
 func GetGumpsCount() <-chan uint16 {
 	p := NewUint16Packet(220)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
- */
 func CloseSimpleGump(GumpIndex uint16) {
 	p := NewVoidPacket(221, GumpIndex)
 	p.send(senderFunc)

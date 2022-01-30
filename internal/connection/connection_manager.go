@@ -3,21 +3,33 @@ package connection
 import (
 	"encoding/binary"
 	"fmt"
+	"log"
 	"net"
 	"os"
+
+	"github.com/drabadan/gostealthclient/config"
 )
 
-// StealthClient connection manager
+// Connection Manager struct
 type ConnectionManager struct {
-	logger Logger
+	logLevel byte
 }
 
-func (c *ConnectionManager) getPort() (scriptPort uint16) {
+// Constructor for connection manager
+func NewConnectionManager(cfg config.Config) *ConnectionManager {
+	return &ConnectionManager{logLevel: cfg.LogLevel}
+}
+
+func (cm *ConnectionManager) getPort() (scriptPort uint16) {
+	if cm.logLevel <= config.LOG_LEVEL_INFO {
+		log.Println("Fetching port from stealth")
+	}
+
 	servAddr := "localhost:47602"
 	tcpAddr, err := net.ResolveTCPAddr("tcp", servAddr)
 	if err != nil {
-		println("ResolveTCPAddr failed:", err.Error())
-		os.Exit(1)
+		log.Fatalf("Failed to connect to stealth.\n Error: %v", err)
+		os.Exit(5)
 	}
 
 	// get port packet
@@ -44,13 +56,15 @@ func (c *ConnectionManager) getPort() (scriptPort uint16) {
 		}
 
 		scriptPort = binary.LittleEndian.Uint16(reply)
+		if cm.logLevel <= config.LOG_LEVEL_INFO {
+			log.Printf("ScriptPort retreived: %v\n", scriptPort)
+		}
 	}
 	conn.Close()
 	return
 }
 
-func sendSCLangPacket(conn *net.TCPConn) {
-	// bytes := []byte{0x9, 0x0, 0x0, 0x0, 0x5, 0x0, 0x0, 0x0, 0xff, 0x0, 0x0, 0x0, 0x0}
+func (cm *ConnectionManager) sendSCLangPacket(conn *net.TCPConn) {
 	bytes := make([]byte, 13)
 	binary.LittleEndian.PutUint16(bytes[0:], 9)
 	binary.LittleEndian.PutUint16(bytes[4:], 5)
@@ -58,25 +72,23 @@ func sendSCLangPacket(conn *net.TCPConn) {
 	conn.Write(bytes)
 }
 
-func connectScript() (*net.TCPConn, error) {
-	scriptPort := getPort()
-	if debug {
-		fmt.Printf("Stealth script port: %v", scriptPort)
-	}
+// Connect to running stealth client application
+func (cm *ConnectionManager) Connect() (*net.TCPConn, error) {
+	scriptPort := cm.getPort()
 
-	servAddr := fmt.Sprintf("localhost:%v", scriptPort)
+	servAddr := fmt.Sprintf(":%v", scriptPort)
 	tcpAddr, err := net.ResolveTCPAddr("tcp", servAddr)
 	if err != nil {
-		println("ResolveTCPAddr failed:", err.Error())
+		log.Fatalf("ResolveTCPAddr failed!\nError: %v", err.Error())
 		return nil, err
 	}
 
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 	if err != nil {
-		println("Dial failed:", err.Error())
+		log.Fatalf("Dial failed: %v", err.Error())
 		return nil, err
 	}
 
-	sendSCLangPacket(conn)
+	cm.sendSCLangPacket(conn)
 	return conn, nil
 }

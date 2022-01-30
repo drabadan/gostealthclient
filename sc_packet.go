@@ -6,20 +6,22 @@ import (
 	"os"
 	"time"
 
+	"github.com/drabadan/gostealthclient/internal/composer"
+	"github.com/drabadan/gostealthclient/internal/encoder"
 	"github.com/ghostiam/binstruct"
 )
 
 type scPacketData struct {
-	pc          *composer
 	bytesToSend []byte
 }
 
 func (p *scPacketData) setSendBytes(pNum uint16, args ...interface{}) {
-	p.pc = newComposer()
-	p.pc.setDatabytes(args)
-	p.pc.setHeader(pNum)
-	p.pc.setPacketId()
-	p.bytesToSend = p.pc.getBytesToSend()
+	encoder := encoder.NewEncoder(binary.LittleEndian)
+	composer := composer.NewComposer(encoder)
+	composer.SetDatabytes(args)
+	composer.SetHeader(pNum)
+	composer.SetPacketId()
+	p.bytesToSend = composer.GetBytesToSend()
 }
 
 func (p *scPacketData) send(sender func(packet *scPacketData)) {

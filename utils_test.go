@@ -1,7 +1,6 @@
 package gostealthclient
 
 import (
-	"fmt"
 	"log"
 	"reflect"
 	"testing"
@@ -25,5 +24,7 @@ func TestDecoder(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("%+v", actual)
+	if actual.Tile != 1302 || actual.X != 2489 || actual.Y != 531 || actual.Color != 0 || actual.Z != 0 {
+		t.Errorf("Failed to deserialize struct.\nReceived: %v", actual)
+	}
 }
