@@ -180,3 +180,11 @@ func TestExtInfo(t *testing.T) {
 	}
 
 }
+
+func TestMethod_AddToSystemJournal(t *testing.T) {
+	s := func() interface{} {
+		sc.AddToSystemJournal("Hello World")
+		return nil
+	}
+	sc.Bootstrap(s)
+}

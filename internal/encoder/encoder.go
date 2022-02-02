@@ -1,4 +1,4 @@
-package gostealthclient
+package encoder
 
 import (
 	"bytes"
@@ -11,51 +11,57 @@ import (
 	"unicode/utf16"
 )
 
-type encoder struct{}
+type Encoder struct {
+	endian binary.ByteOrder
+}
 
-func (e *encoder) encodeString(data string, dataBytes *[]byte) {
+func NewEncoder(endian binary.ByteOrder) *Encoder {
+	return &Encoder{endian: endian}
+}
+
+func (e *Encoder) encodeString(data string, dataBytes *[]byte) {
 	buf := new(bytes.Buffer)
 	sizeBuf := new(bytes.Buffer)
 	encoded := utf16.Encode([]rune(data))
-	binary.Write(buf, binary.LittleEndian, encoded)
-	binary.Write(sizeBuf, binary.LittleEndian, uint32(buf.Len()))
+	binary.Write(buf, e.endian, encoded)
+	binary.Write(sizeBuf, e.endian, uint32(buf.Len()))
 	*dataBytes = append(*dataBytes, sizeBuf.Bytes()...)
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
 
-func (e *encoder) encodeDWord(data uint32, dataBytes *[]byte) {
+func (e *Encoder) encodeDWord(data uint32, dataBytes *[]byte) {
 	buf := new(bytes.Buffer)
 	r := make([]uint32, 0)
 	r = append(r, uint32(data))
-	binary.Write(buf, binary.LittleEndian, r)
+	binary.Write(buf, e.endian, r)
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
 
-func (e *encoder) encodeWord(data uint16, dataBytes *[]byte) {
+func (e *Encoder) encodeWord(data uint16, dataBytes *[]byte) {
 	buf := new(bytes.Buffer)
 	r := make([]uint16, 0)
 	r = append(r, uint16(data))
-	binary.Write(buf, binary.LittleEndian, r)
+	binary.Write(buf, e.endian, r)
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
 
-func (e *encoder) encodeByte(data byte, dataBytes *[]byte) {
+func (e *Encoder) encodeByte(data byte, dataBytes *[]byte) {
 	buf := new(bytes.Buffer)
 	r := make([]byte, 0)
 	r = append(r, byte(data))
-	binary.Write(buf, binary.LittleEndian, r)
+	binary.Write(buf, e.endian, r)
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
 
-func (e *encoder) encodeInt(data int32, dataBytes *[]byte) {
+func (e *Encoder) encodeInt(data int32, dataBytes *[]byte) {
 	buf := new(bytes.Buffer)
 	r := make([]int32, 0)
 	r = append(r, int32(data))
-	binary.Write(buf, binary.LittleEndian, r)
+	binary.Write(buf, e.endian, r)
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
 
-func (e *encoder) encodeBool(data bool, dataBytes *[]byte) {
+func (e *Encoder) encodeBool(data bool, dataBytes *[]byte) {
 	buf := new(bytes.Buffer)
 	r := make([]byte, 0)
 	if data {
@@ -63,47 +69,47 @@ func (e *encoder) encodeBool(data bool, dataBytes *[]byte) {
 	} else {
 		r = append(r, 0)
 	}
-	binary.Write(buf, binary.LittleEndian, r)
+	binary.Write(buf, e.endian, r)
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
 
-func (e *encoder) encodeTime(data time.Time, dataBytes *[]byte) {
+func (e *Encoder) encodeTime(data time.Time, dataBytes *[]byte) {
 	buf := new(bytes.Buffer)
 	t := time.Date(1899, 12, 30, 00, 00, 00, 00, time.Local)
 	delta := data.Sub(t)
 	r := float64(delta.Microseconds()) / 1000000 / 60 / 60 / 24
-	binary.Write(buf, binary.LittleEndian, r)
+	binary.Write(buf, e.endian, r)
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
 
-func (e *encoder) encodeIterable(dataBytes *[]byte, data reflect.Value) {
+func (e *Encoder) encodeIterable(dataBytes *[]byte, data reflect.Value) {
 	size := make([]byte, 4)
 	binary.LittleEndian.PutUint32(size, uint32(data.Len()))
 	*dataBytes = append(*dataBytes, size...)
 
 	for i := 0; i < data.Len(); i++ {
 		val := data.Index(i)
-		e.transformType(dataBytes, val.Interface())
+		e.TransformType(dataBytes, val.Interface())
 	}
 }
 
-func (e *encoder) encodeInt8(data int8, dataBytes *[]byte) {
+func (e *Encoder) encodeInt8(data int8, dataBytes *[]byte) {
 	buf := new(bytes.Buffer)
 	r := make([]int8, 0)
 	r = append(r, int8(data))
-	binary.Write(buf, binary.LittleEndian, r)
+	binary.Write(buf, e.endian, r)
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
 
-func (e *encoder) encodeInt16(data int16, dataBytes *[]byte) {
+func (e *Encoder) encodeInt16(data int16, dataBytes *[]byte) {
 	buf := new(bytes.Buffer)
 	r := make([]int16, 0)
 	r = append(r, int16(data))
-	binary.Write(buf, binary.LittleEndian, r)
+	binary.Write(buf, e.endian, r)
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
 
-func (e *encoder) transformType(dataBytes *[]byte, v interface{}) {
+func (e *Encoder) TransformType(dataBytes *[]byte, v interface{}) {
 	if v != nil {
 		if str, ok := v.(string); ok {
 			e.encodeString(str, dataBytes)
@@ -130,7 +136,7 @@ func (e *encoder) transformType(dataBytes *[]byte, v interface{}) {
 	}
 }
 
-func (e *encoder) transformData(dataBytes *[]byte, data []interface{}) {
+func (e *Encoder) TransformData(dataBytes *[]byte, data []interface{}) {
 	for _, v := range data {
 		rt := reflect.ValueOf(v).Kind()
 		switch rt {
@@ -138,7 +144,7 @@ func (e *encoder) transformData(dataBytes *[]byte, data []interface{}) {
 			varr := reflect.ValueOf(v)
 			e.encodeIterable(dataBytes, varr)
 		default:
-			e.transformType(dataBytes, v)
+			e.TransformType(dataBytes, v)
 		}
 	}
 }
