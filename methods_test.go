@@ -207,7 +207,7 @@ func TestConnection(t *testing.T) {
 
 	for i := 0; i < 5; i++ {
 		sc.Bootstrap(s)
-		time.Sleep(time.Second * 2)
 		log.Println("=================")
+		time.Sleep(time.Second * 2)
 	}
 }

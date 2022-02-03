@@ -9,6 +9,8 @@ const (
 	// In seconds
 	SOCKET_TIMEOUT     = 2
 	SOCKET_MAX_RETRIES = 10
+	SOCKET_HOST        = "localhost"
+	SOCKET_PORT        = 47602
 )
 
 type Config struct {
