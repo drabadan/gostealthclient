@@ -92,13 +92,6 @@ func (cm *ConnectionManager) sendSCLangPacket(conn *net.TCPConn) {
 
 // getConnection returns *net.TCPConn if address resolving and dial succeeded
 func (cm *ConnectionManager) getConnection(host string, port uint16) (*net.TCPConn, error) {
-	if host == "" {
-		host = config.SOCKET_HOST
-	}
-	if port == 0 {
-		port = config.SOCKET_PORT
-	}
-
 	servAddr := fmt.Sprintf("%v:%v", host, port)
 
 	tcpAddr, err := net.ResolveTCPAddr("tcp", servAddr)
