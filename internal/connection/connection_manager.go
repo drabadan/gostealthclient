@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"time"
 
 	"github.com/drabadan/gostealthclient/config"
 )
@@ -35,31 +36,52 @@ func (cm *ConnectionManager) getPort() (scriptPort uint16) {
 	// get port packet
 	bytes := []byte{0x4, 0x0, 0xef, 0xbe, 0xad, 0xde}
 
-	conn, err := net.DialTCP("tcp", nil, tcpAddr)
-	if err != nil {
-		println("Dial failed:", err.Error())
-		os.Exit(1)
-	}
+	for try := 0; try <= config.SOCKET_MAX_RETRIES; try++ {
+		log.Printf("Try #%v", try)
 
-	_, err = conn.Write(bytes)
-	if err != nil {
-		println("Write to server failed:", err.Error())
-		os.Exit(1)
-	}
-
-	for i := 0; i < 2; i++ {
-		reply := make([]byte, 32)
-		_, err = conn.Read(reply)
+		conn, err := net.DialTCP("tcp", nil, tcpAddr)
 		if err != nil {
-			println("Write to server failed:", err.Error())
-			os.Exit(1)
+			log.Println("Dial failed:", err.Error())
+			continue
 		}
 
-		scriptPort = binary.LittleEndian.Uint16(reply)
+		_, err = conn.Write(bytes)
+		if err != nil {
+			log.Println("Write to server failed:", err.Error())
+			conn.Close()
+			continue
+		}
+
+		err = conn.SetReadDeadline(time.Now().Add(config.SOCKET_TIMEOUT * time.Second))
+		if err != nil {
+			log.Println("Connection timed out:", err)
+			conn.Close()
+			continue
+		}
+
+		for i := 0; i < 2; i++ {
+			reply := make([]byte, 32)
+			_, err = conn.Read(reply)
+			if err != nil {
+				log.Println("Read from server failed:", err.Error())
+				conn.Close()
+				continue
+			}
+
+			scriptPort = binary.LittleEndian.Uint16(reply)
+		}
+
+		conn.Close()
+
+		log.Printf("Converted response: %v", scriptPort)
+
+		if scriptPort > 2 {
+			break
+		}
 	}
-	conn.Close()
+
 	if cm.logLevel <= config.LOG_LEVEL_INFO {
-		log.Printf("ScriptPort retreived: %v\n", scriptPort)
+		log.Printf("ScriptPort retrieved: %v\n", scriptPort)
 	}
 	return
 }

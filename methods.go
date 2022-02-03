@@ -2187,9 +2187,14 @@ func UOSay(text string) {
 _uo_say_color = _ScriptMethod(309)  # SendTextToUOColor
 _uo_say_color.argtypes = [_str,  # Text
                           _ushort]  # Color
-func UOSayColor(Text, Color){
-    _uo_say_color(Text, Color)
+*/
+
+func UOSayColor(text string, color uint16) {
+	p := NewVoidPacket(309, text, color)
+	p.send(senderFunc)
 }
+
+/*
 _reg_stealth = 0, '0', 'reg_stealth', 'stealth'
 _reg_char = 1, '1', 'reg_char', 'char'_set_global = _ScriptMethod(310)  # SetGlobal
 _set_global.argtypes = [_ubyte,  # GlobalRegion

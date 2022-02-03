@@ -1,6 +1,7 @@
 package gostealthclient_test
 
 import (
+	"log"
 	"strings"
 	"testing"
 	"time"
@@ -187,4 +188,26 @@ func TestMethod_AddToSystemJournal(t *testing.T) {
 		return nil
 	}
 	sc.Bootstrap(s)
+}
+
+func TestUOSayColor(t *testing.T) {
+	s := func() interface{} {
+		sc.UOSayColor("test", 0x190)
+		return nil
+	}
+
+	sc.Bootstrap(s)
+}
+
+func TestConnection(t *testing.T) {
+	s := func() interface{} {
+		sc.AddToSystemJournal("Hello World")
+		return nil
+	}
+
+	for i := 0; i < 5; i++ {
+		sc.Bootstrap(s)
+		time.Sleep(time.Second * 2)
+		log.Println("=================")
+	}
 }
