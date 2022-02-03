@@ -56,11 +56,11 @@ func (cm *ConnectionManager) getPort() (scriptPort uint16) {
 		}
 
 		scriptPort = binary.LittleEndian.Uint16(reply)
-		if cm.logLevel <= config.LOG_LEVEL_INFO {
-			log.Printf("ScriptPort retreived: %v\n", scriptPort)
-		}
 	}
 	conn.Close()
+	if cm.logLevel <= config.LOG_LEVEL_INFO {
+		log.Printf("ScriptPort retreived: %v\n", scriptPort)
+	}
 	return
 }
 
