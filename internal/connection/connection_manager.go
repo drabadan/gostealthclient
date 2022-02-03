@@ -10,16 +10,18 @@ import (
 	"github.com/drabadan/gostealthclient/config"
 )
 
-// Connection Manager struct
+// ConnectionManager basic struct
 type ConnectionManager struct {
 	logLevel byte
 }
 
-// Constructor for connection manager
+// NewConnectionManager is a constructor for connection manager
 func NewConnectionManager(cfg config.Config) *ConnectionManager {
 	return &ConnectionManager{logLevel: cfg.LogLevel}
 }
 
+// getPort returns Stealth port used for running external scripts
+// to get rid of i\o timeouts retries are used
 func (cm *ConnectionManager) getPort() (scriptPort uint16) {
 	if cm.logLevel <= config.LOG_LEVEL_INFO {
 		log.Println("Fetching port from stealth")
@@ -51,6 +53,7 @@ func (cm *ConnectionManager) getPort() (scriptPort uint16) {
 			continue
 		}
 
+		// Will get 2 replies - length followed by actual port
 		for i := 0; i < 2; i++ {
 			reply := make([]byte, 32)
 			_, err = conn.Read(reply)
@@ -67,6 +70,7 @@ func (cm *ConnectionManager) getPort() (scriptPort uint16) {
 
 		log.Printf("Converted response: %v", scriptPort)
 
+		// If got port, not a length as a response
 		if scriptPort > 2 {
 			break
 		}
@@ -86,6 +90,7 @@ func (cm *ConnectionManager) sendSCLangPacket(conn *net.TCPConn) {
 	conn.Write(bytes)
 }
 
+// getConnection returns *net.TCPConn if address resolving and dial succeeded
 func (cm *ConnectionManager) getConnection(host string, port uint16) (*net.TCPConn, error) {
 	if host == "" {
 		host = config.SOCKET_HOST
@@ -109,7 +114,7 @@ func (cm *ConnectionManager) getConnection(host string, port uint16) (*net.TCPCo
 	return conn, err
 }
 
-// Connect to running stealth client application
+// Connect connects to running stealth client application
 func (cm *ConnectionManager) Connect() (*net.TCPConn, error) {
 	scriptPort := cm.getPort()
 
