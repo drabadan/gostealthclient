@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"os"
 	"time"
 
 	"github.com/drabadan/gostealthclient/config"
@@ -91,7 +90,6 @@ func (cm *ConnectionManager) sendSCLangPacket(conn *net.TCPConn) {
 	_, err := conn.Write(bytes)
 	if err != nil {
 		log.Fatalf("Failed to write to connection buf in sendSCLangPacket func.\n Error: %v", err)
-		os.Exit(5)
 	}
 }
 

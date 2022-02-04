@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"os"
 	"reflect"
 	"time"
 	"unicode/utf16"
@@ -20,7 +19,6 @@ func (e *Encoder) writeBuf(w io.Writer, invoker string, data interface{}) {
 	err := binary.Write(w, e.endian, data)
 	if err != nil {
 		log.Fatalf("Failed to write string buf in %v func.\n Error: %v", invoker, err)
-		os.Exit(5)
 	}
 }
 
@@ -140,7 +138,6 @@ func (e *Encoder) TransformType(dataBytes *[]byte, v interface{}) {
 			e.encodeInt16(i16, dataBytes)
 		} else {
 			log.Fatalf("Failed to parse argument of type %v", fmt.Sprintf("%T", v))
-			os.Exit(500)
 		}
 	}
 }

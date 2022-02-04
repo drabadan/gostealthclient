@@ -3,7 +3,6 @@ package gostealthclient
 import (
 	"encoding/binary"
 	"log"
-	"os"
 	"time"
 
 	"github.com/drabadan/gostealthclient/internal/composer"
@@ -185,7 +184,7 @@ func (p *stealthClientInfoPacket) transform() {
 		build:          binary.LittleEndian.Uint16(b[10:12]),
 		buildDate:      time.Now(),
 		gitRevNumber:   binary.LittleEndian.Uint16(b[20:22]),
-		gitRevision:    decodeUtf16(b[22:]),
+		gitRevision:    DecodeUtf16(b[22:]),
 	}
 }
 
@@ -435,7 +434,6 @@ func (p *scGetExtInfoPacket) transform() {
 
 	if err != nil {
 		log.Fatalf("Failed to parse Ext info! Exiting...")
-		os.Exit(500)
 	}
 	p.out <- ei
 }
@@ -445,6 +443,40 @@ func NewGetExtInfoPacket() *scGetExtInfoPacket {
 	p.setSendBytes(SCGetExtInfo)
 	p.rb = make(chan []byte)
 	p.out = make(chan ExtendedInfo)
+	go receiveByteArray(p.rb)
+	go p.transform()
+	return p
+}
+
+type scGetShopListPacket struct {
+	scCompositePacketData
+	out chan []string
+}
+
+func (p *scGetShopListPacket) transform() {
+	defer close(p.out)
+	b := <-p.rb
+	count := int(binary.LittleEndian.Uint16(b[4:8]))
+	r := make([]string, 0)
+
+	wb := b[8:]
+
+	var size int
+	for i := 0; i < count; i++ {
+		offset := i * size
+		size = int(binary.LittleEndian.Uint32(wb[offset : offset+4]))
+		r = append(r, DecodeUtf16(wb[offset+4:offset+size]))
+	}
+
+	p.out <- r
+}
+
+// Needs testing
+func NewGetShopListPacket() *scGetShopListPacket {
+	p := &scGetShopListPacket{}
+	p.setSendBytes(SCGetShopList)
+	p.rb = make(chan []byte)
+	p.out = make(chan []string)
 	go receiveByteArray(p.rb)
 	go p.transform()
 	return p

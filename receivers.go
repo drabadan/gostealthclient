@@ -1,19 +1,12 @@
 package gostealthclient
 
 import (
-	"bytes"
 	"encoding/binary"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"math"
 	"net"
-	"os"
-	"strings"
 	"time"
-
-	"golang.org/x/text/encoding/unicode"
-	"golang.org/x/text/transform"
 )
 
 const (
@@ -30,7 +23,6 @@ func defaultReceiver(conn *net.TCPConn, mws *[]func(readBuff []byte) []byte) fun
 
 		if err != nil {
 			log.Fatal("Received err from tcp connection. Shutting down...")
-			os.Exit(500)
 		}
 
 		if rtype == BODY_READ_TYPE {
@@ -45,7 +37,6 @@ func defaultReceiver(conn *net.TCPConn, mws *[]func(readBuff []byte) []byte) fun
 				return readBuff
 			case 2:
 				log.Fatal("Received terminate script command. Exiting...")
-				os.Exit(0)
 			case 4:
 				if !paused {
 					log.Println("[WARNING] Received pause script packet. Waiting to proceed...")
@@ -63,7 +54,6 @@ func defaultReceiver(conn *net.TCPConn, mws *[]func(readBuff []byte) []byte) fun
 				}
 			case 3:
 				log.Fatal("Events not implemented! Exiting...")
-				os.Exit(1)
 			}
 		}
 
@@ -83,7 +73,6 @@ func readReplySizeAndType(r uint) uint16 {
 		return readReplySizeAndType(r)
 	} else {
 		log.Fatal("Read packet size failed. Exiting...")
-		os.Exit(500)
 	}
 
 	return 0
@@ -154,27 +143,9 @@ func receiveInt(r chan int32) {
 	r <- readInt()
 }
 
-func decodeUtf16(inputBytes []byte) string {
-	win16be := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
-	// Make a transformer that is like win16be, but abides by BOM:
-	utf16bom := unicode.BOMOverride(win16be.NewDecoder())
-
-	// Make a Reader that uses utf16bom:
-	unicodeReader := transform.NewReader(bytes.NewReader(inputBytes[6:]), utf16bom)
-
-	// decode and print:
-	decoded, err := ioutil.ReadAll(unicodeReader)
-	if err != nil {
-		log.Fatal("Failed to parse string from packet...")
-		os.Exit(500)
-	}
-
-	return strings.Replace(string(decoded), "\r\n", "\n", -1)
-}
-
 func readStringResponse() string {
 	replyBuf := receiverFunc(readReplySize(), BODY_READ_TYPE)
-	return decodeUtf16(replyBuf)
+	return DecodeUtf16(replyBuf)
 }
 
 func receiveString(r chan string) {

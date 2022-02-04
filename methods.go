@@ -492,7 +492,6 @@ func UseVirtue(VirtueName string) {
 		p.send(senderFunc)
 	} else {
 		log.Fatalf("Unknown virtue %v", VirtueName)
-		os.Exit(500)
 	}
 }
 
@@ -2026,48 +2025,50 @@ func NS() uint16 { return 0x0F88 }
 func SA() uint16 { return 0x0F8C }
 func SS() uint16 { return 0x0F8D }
 
+func BPCount() <-chan uint32 {
+	<-FindTypeEx(BP(), 0, <-Backpack(), true)
+	return FindFullQuantity()
+}
+
+func BMCount() <-chan uint32 {
+	<-FindTypeEx(BM(), 0, <-Backpack(), true)
+
+	return FindFullQuantity()
+}
+func GACount() <-chan uint32 {
+	<-FindTypeEx(GA(), 0, <-Backpack(), true)
+	return FindFullQuantity()
+}
+func GSCount() <-chan uint32 {
+	<-FindTypeEx(GS(), 0, <-Backpack(), true)
+	return FindFullQuantity()
+}
+func MRCount() <-chan uint32 {
+	<-FindTypeEx(MR(), 0, <-Backpack(), true)
+	return FindFullQuantity()
+}
+func NSCount() <-chan uint32 {
+	<-FindTypeEx(NS(), 0, <-Backpack(), true)
+	return FindFullQuantity()
+}
+func SACount() <-chan uint32 {
+	<-FindTypeEx(SA(), 0, <-Backpack(), true)
+	return FindFullQuantity()
+}
+func SSCount() <-chan uint32 {
+	<-FindTypeEx(SS(), 0, <-Backpack(), true)
+	return FindFullQuantity()
+}
+
+func AutoBuy(itemType, itemColor, quantity uint16) {
+	p := NewVoidPacket(SCAutoBuy, itemType, itemColor, quantity)
+	p.send(senderFunc)
+}
+
 /*
-func BPCount(){
-    FindTypeEx(BP(), 0, Backpack(), True)
-}
-    return FindFullQuantity()
-func BMCount(){
-    FindTypeEx(BM(), 0, Backpack(), True)
-}
-    return FindFullQuantity()
-func GACount(){
-    FindTypeEx(GA(), 0, Backpack(), True)
-}
-    return FindFullQuantity()
-func GSCount(){
-    FindTypeEx(GS(), 0, Backpack(), True)
-}
-    return FindFullQuantity()
-func MRCount(){
-    FindTypeEx(MR(), 0, Backpack(), True)
-}
-    return FindFullQuantity()
-func NSCount(){
-    FindTypeEx(NS(), 0, Backpack(), True)
-}
-    return FindFullQuantity()
-func SACount(){
-    FindTypeEx(SA(), 0, Backpack(), True)
-}
-    return FindFullQuantity()
-func SSCount(){
-    FindTypeEx(SS(), 0, Backpack(), True)
-}
-    return FindFullQuantity()
-_auto_buy = _ScriptMethod(240)  # AutoBuy
-_auto_buy.argtypes = [_ushort,  # ItemType
-                      _ushort,  # ItemColor
-                      _ushort]  # Quantity
-func AutoBuy(ItemType, ItemColor, Quantity){
-    _auto_buy(ItemType, ItemColor, Quantity)
-}
 _get_shop_list = _ScriptMethod(241)  # GetShopList
 _get_shop_list.restype = _buffer
+
 func GetShopList(){
     result = []
 }
