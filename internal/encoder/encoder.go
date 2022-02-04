@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"reflect"
@@ -15,6 +16,14 @@ type Encoder struct {
 	endian binary.ByteOrder
 }
 
+func (e *Encoder) writeBuf(w io.Writer, invoker string, data interface{}) {
+	err := binary.Write(w, e.endian, data)
+	if err != nil {
+		log.Fatalf("Failed to write string buf in %v func.\n Error: %v", invoker, err)
+		os.Exit(5)
+	}
+}
+
 func NewEncoder(endian binary.ByteOrder) *Encoder {
 	return &Encoder{endian: endian}
 }
@@ -23,8 +32,8 @@ func (e *Encoder) encodeString(data string, dataBytes *[]byte) {
 	buf := new(bytes.Buffer)
 	sizeBuf := new(bytes.Buffer)
 	encoded := utf16.Encode([]rune(data))
-	binary.Write(buf, e.endian, encoded)
-	binary.Write(sizeBuf, e.endian, uint32(buf.Len()))
+	e.writeBuf(buf, "encodeString string", encoded)
+	e.writeBuf(sizeBuf, "encodeString size", uint32(buf.Len()))
 	*dataBytes = append(*dataBytes, sizeBuf.Bytes()...)
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
@@ -33,7 +42,7 @@ func (e *Encoder) encodeDWord(data uint32, dataBytes *[]byte) {
 	buf := new(bytes.Buffer)
 	r := make([]uint32, 0)
 	r = append(r, uint32(data))
-	binary.Write(buf, e.endian, r)
+	e.writeBuf(buf, "encodeDWord", r)
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
 
@@ -41,7 +50,7 @@ func (e *Encoder) encodeWord(data uint16, dataBytes *[]byte) {
 	buf := new(bytes.Buffer)
 	r := make([]uint16, 0)
 	r = append(r, uint16(data))
-	binary.Write(buf, e.endian, r)
+	e.writeBuf(buf, "encodeWord", r)
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
 
@@ -49,7 +58,7 @@ func (e *Encoder) encodeByte(data byte, dataBytes *[]byte) {
 	buf := new(bytes.Buffer)
 	r := make([]byte, 0)
 	r = append(r, byte(data))
-	binary.Write(buf, e.endian, r)
+	e.writeBuf(buf, "encodeByte", r)
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
 
@@ -57,7 +66,7 @@ func (e *Encoder) encodeInt(data int32, dataBytes *[]byte) {
 	buf := new(bytes.Buffer)
 	r := make([]int32, 0)
 	r = append(r, int32(data))
-	binary.Write(buf, e.endian, r)
+	e.writeBuf(buf, "encodeInt", r)
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
 
@@ -69,7 +78,7 @@ func (e *Encoder) encodeBool(data bool, dataBytes *[]byte) {
 	} else {
 		r = append(r, 0)
 	}
-	binary.Write(buf, e.endian, r)
+	e.writeBuf(buf, "encodeBool", r)
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
 
@@ -78,7 +87,7 @@ func (e *Encoder) encodeTime(data time.Time, dataBytes *[]byte) {
 	t := time.Date(1899, 12, 30, 00, 00, 00, 00, time.Local)
 	delta := data.Sub(t)
 	r := float64(delta.Microseconds()) / 1000000 / 60 / 60 / 24
-	binary.Write(buf, e.endian, r)
+	e.writeBuf(buf, "encodeTime", r)
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
 
@@ -97,7 +106,7 @@ func (e *Encoder) encodeInt8(data int8, dataBytes *[]byte) {
 	buf := new(bytes.Buffer)
 	r := make([]int8, 0)
 	r = append(r, int8(data))
-	binary.Write(buf, e.endian, r)
+	e.writeBuf(buf, "encodeInt8", r)
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
 
@@ -105,7 +114,7 @@ func (e *Encoder) encodeInt16(data int16, dataBytes *[]byte) {
 	buf := new(bytes.Buffer)
 	r := make([]int16, 0)
 	r = append(r, int16(data))
-	binary.Write(buf, e.endian, r)
+	e.writeBuf(buf, "encodeInt16", r)
 	*dataBytes = append(*dataBytes, buf.Bytes()...)
 }
 

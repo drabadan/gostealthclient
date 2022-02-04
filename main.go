@@ -16,12 +16,12 @@ func Bootstrap(script func() interface{}) interface{} {
 	cfg := config.NewConfig(0)
 	cm := connection.NewConnectionManager(*cfg)
 	conn, err := cm.Connect()
-	defer conn.Close()
 
 	if err != nil {
 		os.Exit(5)
 	}
 
+	defer conn.Close()
 	senderFunc = sender(conn)
 	mws := make([]func(readBuff []byte) []byte, 0)
 	receiverFunc = defaultReceiver(conn, &mws)

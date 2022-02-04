@@ -4,8 +4,6 @@ var (
 	debug = true
 )
 
-var increment uint16 = 0
-
 const READ_DELAY = 0 // time.Microsecond * 50
 
 const (
