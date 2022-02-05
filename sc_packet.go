@@ -97,6 +97,19 @@ func NewBytePacket(packetNum uint16, args ...interface{}) *bytePacket {
 	return p
 }
 
+type byteArrayPacket struct {
+	scPacketData
+	out chan []byte
+}
+
+func NewByteArrayPacket(packetNum uint16, args ...interface{}) *byteArrayPacket {
+	p := &byteArrayPacket{}
+	p.setSendBytes(packetNum, args...)
+	p.out = make(chan []byte)
+	go receiveByteArray(p.out)
+	return p
+}
+
 type boolPacket struct {
 	scPacketData
 	out chan bool

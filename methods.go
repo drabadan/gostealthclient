@@ -2065,40 +2065,22 @@ func AutoBuy(itemType, itemColor, quantity uint16) {
 	p.send(senderFunc)
 }
 
-/*
-_get_shop_list = _ScriptMethod(241)  # GetShopList
-_get_shop_list.restype = _buffer
-
-func GetShopList(){
-    result = []
+func GetShopList() <-chan []string {
+	p := NewGetShopListPacket()
+	p.send(senderFunc)
+	return p.out
 }
-    data = _get_shop_list()
-    count = _uint.from_buffer(data)
-    offset = count.size
-    while 42:
-        if offset >= len(data) - 1:
-            break
-        string = _str.from_buffer(data, offset)
-        offset += string.size
-        result.append(string.value)
-    return result
-*/
+
 func ClearShopList() {
 	p := NewVoidPacket(242)
 	p.send(senderFunc)
 }
 
-/*
-_auto_buy_extended = _ScriptMethod(243)  # AutoBuyEx
-_auto_buy_extended.argtypes = [_ushort,  # ItemType
-                               _ushort,  # ItemColor
-                               _ushort,  # Quantity
-                               _uint,  # Price
-                               _str]  # ItemName
-func AutoBuyEx(ItemType, ItemColor, Quantity, Price, ItemName){
-    _auto_buy_extended(ItemType, ItemColor, Quantity, Price, ItemName)
+func AutoBuyEx(itemType, itemColor, quantity uint16, price uint32, itemName string) {
+	p := NewVoidPacket(SCAutoBuyEx, itemType, itemColor, itemName, quantity, price, itemName)
+	p.send(senderFunc)
 }
-*/
+
 func GetAutoBuyDelay() <-chan uint16 {
 	p := NewUint16Packet(244)
 	p.send(senderFunc)
@@ -2151,29 +2133,22 @@ func MobileCanBeRenamed(Mob_ID uint32) <-chan bool {
 	return p.out
 }
 
-/*
-_lock_stat = _ScriptMethod(254)  # ChangeStatLockState
-_lock_stat.argtypes = [_ubyte,  # statNum
-                       _ubyte]  # statState
-func SetStatState(statNum, statState){
-    _lock_stat(statNum, statState)
+func SetStatState(statNum, statState byte) {
+	p := NewVoidPacket(254, statNum, statState)
+	p.send(senderFunc)
 }
-_get_static_art_bitmap = _ScriptMethod(255)  # GetStaticArtBitmap
-_get_static_art_bitmap.restype = _buffer  # Bitmap file in bytes
-_get_static_art_bitmap.argtypes = [_uint,  # Id
-                                   _ushort]  # Hue
-func GetStaticArtBitmap(Id, Hue){
-    p :=
-p.send(senderFunc)
-// return _get_static_art_bitmap(Id, Hue)
+
+func GetStaticArtBitmap(id uint32, hue uint16) <-chan []byte {
+	p := NewByteArrayPacket(SCGetStaticArtBitmap, id, hue)
+	p.send(senderFunc)
+	return p.out
 }
-_print_script_methods = _ScriptMethod(256)  # PrintScriptMethodsList
-_print_script_methods.argtypes = [_str,  # FileName
-                                  _bool]  # SortedList
-func PrintScriptMethodsList(FileName, SortedList){
-    _print_script_methods(FileName, SortedList)
+
+func PrintScriptMethodsList(fileName string, sortedList bool) {
+	p := NewVoidPacket(256, fileName, sortedList)
+	p.send(senderFunc)
 }
-*/
+
 func Alarm() {
 	p := NewVoidPacket(257)
 	p.send(senderFunc)
@@ -2183,12 +2158,6 @@ func UOSay(text string) {
 	p := NewVoidPacket(308, text)
 	p.send(senderFunc)
 }
-
-/*
-_uo_say_color = _ScriptMethod(309)  # SendTextToUOColor
-_uo_say_color.argtypes = [_str,  # Text
-                          _ushort]  # Color
-*/
 
 func UOSayColor(text string, color uint16) {
 	p := NewVoidPacket(309, text, color)
@@ -2226,12 +2195,11 @@ p.send(senderFunc)
 // return _get_global(region[0], VarName)
     else:
         raise ValueError('GlobalRegion must be "stealth" or "char".')
-_console_entry_reply = _ScriptMethod(312)
-_console_entry_reply.argtypes = [_str]  # Text
-func ConsoleEntryReply(Text){
-    _console_entry_reply(Text)
-}
 */
+func ConsoleEntryReply(text string) {
+	p := NewVoidPacket(312, text)
+	p.send(senderFunc)
+}
 func ConsoleEntryUnicodeReply(text string) {
 	p := NewVoidPacket(313, text)
 	p.send(senderFunc)
@@ -2342,33 +2310,23 @@ func InParty() <-chan bool {
 	return p.out
 }
 
-/*
-_get_party_members = _ScriptMethod(270)  # PartyMembersList
-_get_party_members.restype = _buffer  # Array of Cardinal
-func PartyMembersList(){
-    result = []
+func PartyMembersList() <-chan []uint32 {
+	p := NewUint32ArrayPacket(SCPartyMembersList)
+	p.send(senderFunc)
+	return p.out
 }
-    data = _get_party_members()
-    count = _uint.from_buffer(data)
-    if count:
-        fmt = '<' + count * 'I'
-        result.extend(_struct.unpack(fmt, data))
-    return result
-*/
+
 func ICQConnected() <-chan bool {
 	p := NewBoolPacket(272)
 	p.send(senderFunc)
 	return p.out
 }
 
-/*
-_icq_connect = _ScriptMethod(273)  # ICQ_Connect
-_icq_connect.argtypes = [_uint,  # UIN
-                         _str]  # Password
-func ICQConnect(UIN, Password){
-    _icq_connect(UIN, Password)
+func ICQConnect(UIN uint32, password string) {
+	p := NewVoidPacket(273, UIN, password)
+	p.send(senderFunc)
 }
-*/
+
 func ICQDisconnect() {
 	p := NewVoidPacket(274)
 	p.send(senderFunc)
@@ -2472,6 +2430,7 @@ _uint_to_flags = _ScriptMethod(350)  # ConvertIntegerToFlags
 _uint_to_flags.restype = _buffer
 _uint_to_flags.argtypes = [_ubyte,  # Group
                            _uint]  # Flags
+
 func ConvertIntegerToFlags(Group, Flags){
     if Group not in _tile_groups.keys():
 }
@@ -2560,16 +2519,6 @@ func GetSurfaceZ(x, y uint16, worldNum byte) <-chan byte {
 	return p.out
 }
 
-/*
-_is_cell_passable = _ScriptMethod(285)  # IsWorldCellPassable
-_is_cell_passable.restype = _buffer  # Boolean, ShortInt  4 bytes
-_is_cell_passable.argtypes = [_ushort,  # CurrX
-                              _ushort,  # CurrY
-                              _byte,  # CurrZ
-                              _ushort,  # DestX
-                              _ushort,  # DestY
-                              _ubyte]  # WorldNum
-*/
 func IsWorldCellPassable(currX, currY uint16, currZ int8, destX, destY uint16, worldNum byte) <-chan WorldCellPassable {
 	p := NewIsWorldCellPassablePacket(currX, currY, currZ, destX, destY, worldNum)
 	p.send(senderFunc)
