@@ -1477,34 +1477,29 @@ func CloseSimpleGump(GumpIndex uint16) {
 	p.send(senderFunc)
 }
 
+func IsGump() bool {
+	return <-GetGumpsCount() > 0
+}
+
+func GetGumpSerial(gumpIndex uint16) <-chan uint32 {
+	p := NewUint32Packet(SCGetGumpSerial, gumpIndex)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetGumpID(gumpIndex uint16) <-chan uint32 {
+	p := NewUint32Packet(SCGetGumpID, gumpIndex)
+	p.send(senderFunc)
+	return p.out
+}
+
+func IsGumpCanBeClosed(gumpIndex uint16) <-chan bool {
+	p := NewBoolPacket(SCGetGumpNoClose, gumpIndex)
+	p.send(senderFunc)
+	return p.out
+}
+
 /*
-func IsGump(){
-    return GetGumpsCount() > 0
-}
-_get_gump_serial = _ScriptMethod(222)  # GetGumpSerial
-_get_gump_serial.restype = _uint
-_get_gump_serial.argtypes = [_ushort]  # GumpIndex
-func GetGumpSerial(GumpIndex){
-    p :=
-p.send(senderFunc)
-// return _get_gump_serial(GumpIndex)
-}
-_get_gump_type = _ScriptMethod(223)  # GetGumpID
-_get_gump_type.restype = _uint
-_get_gump_type.argtypes = [_ushort]  # GumpIndex
-func GetGumpID(GumpIndex){
-    p :=
-p.send(senderFunc)
-// return _get_gump_type(GumpIndex)
-}
-_get_gump_no_close = _ScriptMethod(224)  # GetGumpNoClose
-_get_gump_no_close.restype = _bool
-_get_gump_no_close.argtypes = [_ushort]  # GumpIndex
-func IsGumpCanBeClosed(GumpIndex){
-    p :=
-p.send(senderFunc)
-// return _get_gump_no_close(GumpIndex)
-}
 _get_gump_text = _ScriptMethod(225)  # GetGumpTextLines
 _get_gump_text.restype = _buffer
 _get_gump_text.argtypes = [_ushort]  # GumpIndex
@@ -2166,7 +2161,8 @@ func UOSayColor(text string, color uint16) {
 
 /*
 _reg_stealth = 0, '0', 'reg_stealth', 'stealth'
-_reg_char = 1, '1', 'reg_char', 'char'_set_global = _ScriptMethod(310)  # SetGlobal
+_reg_char = 1, '1', 'reg_char', 'char'
+_set_global = _ScriptMethod(310)  # SetGlobal
 _set_global.argtypes = [_ubyte,  # GlobalRegion
                         _str,  # VarName
                         _str]  # VarValue
@@ -2495,17 +2491,12 @@ func GetCell(X, Y, WorldNum){
         values = _struct.unpack(fmt, data)
         result.update(zip(keys, values))
     return result
-_get_layer_count = _ScriptMethod(282)  # GetLayerCount
-_get_layer_count.restype = _ubyte
-_get_layer_count.argtypes = [_ushort,  # X
-                             _ushort,  # Y
-                             _ubyte]  # WorldNum
-func GetLayerCount(X, Y, WorldNum){
-    p :=
-p.send(senderFunc)
-// return _get_layer_count(X, Y, WorldNum)
-}
 */
+func GetLayerCount(x, y uint16, worldNum byte) <-chan byte {
+	p := NewBytePacket(SCGetLayerCount, x, y, worldNum)
+	p.send(senderFunc)
+	return p.out
+}
 
 func ReadStaticsXY(x, y uint16, wnum byte) <-chan []StaticsXY {
 	p := NewReadStaticsXYPacket(x, y, wnum)
@@ -3100,78 +3091,67 @@ p.send(senderFunc)
         item.text = text.value
         result.append(item)    return result
 */
-func CloseClientGump(ID uint32) {
-	p := NewVoidPacket(342, ID)
+func CloseClientGump(iD uint32) {
+	p := NewVoidPacket(342, iD)
 	p.send(senderFunc)
 }
 
-/*
-_get_next_step_z = _ScriptMethod(366)  # GetNextStepZ
-_get_next_step_z.restype = _byte
-_get_next_step_z.argtypes = [_ushort,  # CurrX
-                             _ushort,  # CurrY
-                             _ushort,  # DestX
-                             _ushort,  # DestY
-                             _ubyte,  # WorldNum
-                             _byte]  # CurrZ
-func GetNextStepZ(CurrX, CurrY, DestX, DestY, WorldNum, CurrZ){
-    p :=
-p.send(senderFunc)
-// return _get_next_step_z(CurrX, CurrY, DestX, DestY, WorldNum, CurrZ)
+func GetNextStepZ(currX, currY, destX, destY uint16, worldNum byte, currZ int8) <-chan int8 {
+	p := NewInt8Packet(SCGetNextStepZ, currX, currY, destX, destY, worldNum, currZ)
+	p.send(senderFunc)
+	return p.out
 }
-*/
+
 func ClientHide(ID uint32) <-chan bool {
 	p := NewBoolPacket(368, ID)
 	p.send(senderFunc)
 	return p.out
 }
 
+func GetSkillLockState(skillName string) <-chan int8 {
+	p := NewInt8Packet(SCGetSkillLockState, skillName)
+	p.send(senderFunc)
+	return p.out
+}
+
+func GetStatLockState(skillName string) <-chan byte {
+	p := NewBytePacket(SCGetStatLockState)
+	p.send(senderFunc)
+	return p.out
+}
+
+func EquipLastWeapon() {
+	p := NewVoidPacket(SCEquipLastWeapon)
+	p.send(senderFunc)
+}
+
+func BookGetPageText(page uint16) <-chan string {
+	p := NewStringPacket(SCBookGetPageText, page)
+	p.send(senderFunc)
+	return p.out
+}
+
+func BookSetText(text string) {
+	p := NewVoidPacket(SCBookSetText, text)
+	p.send(senderFunc)
+}
+
+func BookSetPageText(page uint16, text string) {
+	p := NewVoidPacket(SCBookSetText, page, text)
+	p.send(senderFunc)
+}
+
+func BookClearText() {
+	p := NewVoidPacket(SCBookClearText)
+	p.send(senderFunc)
+}
+
+func BookSetHeader(title, author string) {
+	p := NewVoidPacket(SCBookSetHeader, title, author)
+	p.send(senderFunc)
+}
+
 /*
-_get_skill_lock_state = _ScriptMethod(369)  # GetSkillLockState
-_get_skill_lock_state.restype = _byte
-_get_skill_lock_state.argtypes = [_str]  # SkillName
-func GetSkillLockState(SkillName){
-    p :=
-p.send(senderFunc)
-// return _get_skill_lock_state(SkillName)
-}
-_get_stat_lock_state = _ScriptMethod(372)  # GetStatLockState
-_get_stat_lock_state.restype = _byte
-_get_stat_lock_state.argtypes = [_str]  # SkillName
-func GetStatLockState(SkillName){
-    _get_stat_lock_state(SkillName)
-}
-_equip_last_weapon = _ScriptMethod(370)
-func EquipLastWeapon(){
-    _equip_last_weapon()
-}
-# Book functions_book_get_page_text = _ScriptMethod(373)
-_book_get_page_text.restype = _str
-_book_get_page_text.argtypes = [_ushort]
-func BookGetPageText(Page){
-    p :=
-p.send(senderFunc)
-// return _book_get_page_text(Page)
-}
-_book_set_text = _ScriptMethod(374)
-_book_set_text.argtypes = [_str]
-func BookSetText(Text){
-    _book_set_text(Text)
-}
-_book_set_page_text = _ScriptMethod(375)
-_book_set_page_text.argtypes = [_ushort, _str]
-func BookSetPageText(Page, Text){
-    _book_set_page_text(Page, Text)
-}
-_book_clear_text = _ScriptMethod(376)
-func BookClearText(){
-    _book_clear_text()
-}
-_book_set_header = _ScriptMethod(377)
-_book_set_header.argtypes = [_str, _str]
-func BookSetHeader(title, author){
-    _book_set_header(title, author)
-}
 # Character creation_create_char = _ScriptMethod(371)
 _create_char.argtypes =[
     _str,  # ProfileName
