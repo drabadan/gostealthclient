@@ -6,250 +6,260 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	n "github.com/drabadan/gostealthclient/internal/network"
+	c "github.com/drabadan/gostealthclient/pkg/constants"
+	m "github.com/drabadan/gostealthclient/pkg/model"
 )
 
 func Connected() <-chan bool {
-	p := NewBoolPacket(SCGetConnectedStatus)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(c.SCGetConnectedStatus)
+
+	return p.Out
 }
 func AddToSystemJournal(text string) {
-	p := NewVoidPacket(SCAddToSystemJournal, text)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCAddToSystemJournal, text)
+
 }
-func GetStealthInfo() <-chan stealthClientInfo {
-	p := NewStealthClientInfoPacket()
+
+/**
+ TODO: Fix
+
+func GetStealthInfo() <-chan StealthClientInfo {
+	p := n.NewStealthClientInfoPacket()
 	go p.transform()
-	p.send(senderFunc)
-	return p.out
+
+	return p.Out
 }
+*/
+
 func Connect() {
-	p := NewVoidPacket(SCConnect)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCConnect)
+
 }
 func Disconnect() {
-	p := NewVoidPacket(SCDisconnect)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCDisconnect)
+
 }
 func SetPauseScriptOnDisconnectStatus(value bool) {
-	p := NewVoidPacket(SCSetPauseScriptOnDisconnectStatus, value)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCSetPauseScriptOnDisconnectStatus, value)
+
 }
 func GetPauseScriptOnDisconnectStatus() <-chan bool {
-	p := NewBoolPacket(SCGetPauseScriptOnDisconnectStatus)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(c.SCGetPauseScriptOnDisconnectStatus)
+
+	return p.Out
 }
 func SetARStatus(value bool) {
-	p := NewVoidPacket(SCSetARStatus, value)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCSetARStatus, value)
+
 }
 func GetARStatus() <-chan bool {
-	p := NewBoolPacket(SCGetARStatus)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(c.SCGetARStatus)
+
+	return p.Out
 }
 func CharName() <-chan string {
-	p := NewStringPacket(SCGetCharName)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(c.SCGetCharName)
+
+	return p.Out
 }
 func ChangeProfile(profileName string) <-chan int32 {
-	p := NewIntPacket(SCChangeProfile, profileName)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewIntPacket(c.SCChangeProfile, profileName)
+
+	return p.Out
 }
 func ChangeProfileEx(pName, shardName, charName string) <-chan uint16 {
-	p := NewUint16Packet(SCChangeProfileEx, pName, shardName, charName)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(c.SCChangeProfileEx, pName, shardName, charName)
+
+	return p.Out
 }
 func ProfileName() <-chan string {
-	p := NewStringPacket(SCGetProfileName)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(c.SCGetProfileName)
+
+	return p.Out
 }
 func Self() <-chan uint32 {
-	p := NewUint32Packet(SCGetSelfID)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(c.SCGetSelfID)
+
+	return p.Out
 }
 func Sex() <-chan byte {
-	p := NewBytePacket(SCGetSelfSex)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBytePacket(c.SCGetSelfSex)
+
+	return p.Out
 }
 func GetCharTitle() <-chan string {
-	p := NewStringPacket(SCGetCharTitle)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(c.SCGetCharTitle)
+
+	return p.Out
 }
 func Gold() <-chan uint16 {
-	p := NewUint16Packet(SCGetSelfGold)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(c.SCGetSelfGold)
+
+	return p.Out
 }
 func Armor() <-chan uint16 {
-	p := NewUint16Packet(SCGetSelfArmor)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(c.SCGetSelfArmor)
+
+	return p.Out
 }
 func Weight() <-chan uint16 {
-	p := NewUint16Packet(SCGetSelfWeight)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(c.SCGetSelfWeight)
+
+	return p.Out
 }
 func MaxWeight() <-chan uint16 {
-	p := NewUint16Packet(SCGetSelfMaxWeight)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(c.SCGetSelfMaxWeight)
+
+	return p.Out
 }
 func WorldNum() <-chan byte {
-	p := NewBytePacket(SCGetWorldNum)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBytePacket(c.SCGetWorldNum)
+
+	return p.Out
 }
 func Race() <-chan byte {
-	p := NewBytePacket(SCGetSelfRace)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBytePacket(c.SCGetSelfRace)
+
+	return p.Out
 }
 func MaxPets() <-chan byte {
-	p := NewBytePacket(SCGetSelfPetsMax)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBytePacket(c.SCGetSelfPetsMax)
+
+	return p.Out
 }
 func PetsCurrent() <-chan byte {
-	p := NewBytePacket(SCGetSelfPetsCurrent)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBytePacket(c.SCGetSelfPetsCurrent)
+
+	return p.Out
 }
 func FireResist() <-chan uint16 {
-	p := NewUint16Packet(SCGetSelfFireResist)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(c.SCGetSelfFireResist)
+
+	return p.Out
 }
 func ColdResist() <-chan uint16 {
-	p := NewUint16Packet(SCGetSelfColdResist)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(c.SCGetSelfColdResist)
+
+	return p.Out
 }
 func PoisonResist() <-chan uint16 {
-	p := NewUint16Packet(SCGetSelfPoisonResist)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(c.SCGetSelfPoisonResist)
+
+	return p.Out
 }
 func EnergyResist() <-chan uint16 {
-	p := NewUint16Packet(SCGetSelfEnergyResist)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(c.SCGetSelfEnergyResist)
+
+	return p.Out
 }
 
 func ConnectedTime() <-chan time.Time {
-	p := NewTimePacket(SCGetConnectedTime)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewTimePacket(c.SCGetConnectedTime)
+
+	return p.Out
 }
 
 func DisconnectedTime() <-chan time.Time {
-	p := NewTimePacket(SCGetDisconnectedTime)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewTimePacket(c.SCGetDisconnectedTime)
+
+	return p.Out
 }
 
 func LastContainer() <-chan uint32 {
-	p := NewUint32Packet(SCGetLastContainer)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(c.SCGetLastContainer)
+
+	return p.Out
 }
 
 func LastTarget() <-chan uint32 {
-	p := NewUint32Packet(SCGetLastTarget)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(c.SCGetLastTarget)
+
+	return p.Out
 }
 
 func LastAttack() <-chan uint32 {
-	p := NewUint32Packet(SCGetLastAttack)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(c.SCGetLastAttack)
+
+	return p.Out
 }
 
 func LastStatus() <-chan uint32 {
-	p := NewUint32Packet(43)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(43)
+
+	return p.Out
 }
 
 func LastObject() <-chan uint32 {
-	p := NewUint32Packet(44)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(44)
+
+	return p.Out
 }
 
-func GetBuffBarInfo() <-chan BuffBarInfo {
-	p := NewBuffBarInfo()
-	p.send(senderFunc)
-	return p.out
+func GetBuffBarInfo() <-chan m.BuffBarInfo {
+	p := n.NewBuffBarInfo()
+
+	return p.Out
 }
 
 func ShardName() <-chan string {
-	p := NewStringPacket(47)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(47)
+
+	return p.Out
 }
 
 func ProfileShardName() <-chan string {
-	p := NewStringPacket(343)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(343)
+
+	return p.Out
 }
 
 func ProxyIP() <-chan string {
-	p := NewStringPacket(60)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(60)
+
+	return p.Out
 }
 
 func ProxyPort() <-chan uint16 {
-	p := NewUint16Packet(SCGetProxyPort)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(c.SCGetProxyPort)
+
+	return p.Out
 }
 
 func UseProxy() <-chan bool {
-	p := NewBoolPacket(62)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(62)
+
+	return p.Out
 }
 func Backpack() <-chan uint32 {
-	p := NewUint32Packet(48)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(48)
+
+	return p.Out
 }
 
 func Str() <-chan uint32 {
-	p := NewUint32Packet(49)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(49)
+
+	return p.Out
 }
 
 func Int() <-chan uint32 {
-	p := NewUint32Packet(50)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(50)
+
+	return p.Out
 }
 
 func Dex() <-chan uint32 {
-	p := NewUint32Packet(51)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(51)
+
+	return p.Out
 }
 
 func Life() <-chan uint32 {
-	p := NewUint32Packet(52)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(52)
+
+	return p.Out
 }
 
 func HP() <-chan uint32 {
@@ -257,21 +267,21 @@ func HP() <-chan uint32 {
 }
 
 func Mana() <-chan uint32 {
-	p := NewUint32Packet(53)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(53)
+
+	return p.Out
 }
 
 func Stam() <-chan uint32 {
-	p := NewUint32Packet(54)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(54)
+
+	return p.Out
 }
 
 func MaxLife() <-chan uint32 {
-	p := NewUint32Packet(55)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(55)
+
+	return p.Out
 }
 
 func MaxHP() <-chan uint32 {
@@ -279,186 +289,186 @@ func MaxHP() <-chan uint32 {
 }
 
 func MaxMana() <-chan uint32 {
-	p := NewUint32Packet(56)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(56)
+
+	return p.Out
 }
 
 func MaxStam() <-chan uint32 {
-	p := NewUint32Packet(57)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(57)
+
+	return p.Out
 }
 
 func Luck() <-chan uint16 {
-	p := NewUint16Packet(SCGetSelfLuck)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(c.SCGetSelfLuck)
+
+	return p.Out
 }
 
-func GetExtInfo() <-chan ExtendedInfo {
-	p := NewGetExtInfoPacket()
-	p.send(senderFunc)
-	return p.out
+func GetExtInfo() <-chan m.ExtendedInfo {
+	p := n.NewGetExtInfoPacket()
+
+	return p.Out
 }
 
 func Hidden() <-chan bool {
-	p := NewBoolPacket(63)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(63)
+
+	return p.Out
 }
 
 func Poisoned() <-chan bool {
-	p := NewBoolPacket(64)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(64)
+
+	return p.Out
 }
 
 func Paralyzed() <-chan bool {
-	p := NewBoolPacket(65)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(65)
+
+	return p.Out
 }
 
 func Dead() <-chan bool {
-	p := NewBoolPacket(66)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(66)
+
+	return p.Out
 }
 
 func WarMode() <-chan bool {
-	p := NewBoolPacket(171, <-Self())
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(171, <-Self())
+
+	return p.Out
 }
 
 func WarTargetID() <-chan uint32 {
-	p := NewUint32Packet(SCGetWarTarget)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(c.SCGetWarTarget)
+
+	return p.Out
 }
 
 func SetWarMode(value bool) {
-	p := NewVoidPacket(SCSetWarMode, value)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCSetWarMode, value)
+
 }
 
 func Attack(attackedID uint32) {
-	p := NewVoidPacket(SCAttack, attackedID)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCAttack, attackedID)
+
 }
 
 func UseSelfPaperdollScroll() {
-	p := NewVoidPacket(SCUseSelfPaperdollScroll)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCUseSelfPaperdollScroll)
+
 }
 
 func UseOtherPaperdollScroll(oid uint32) {
-	p := NewVoidPacket(SCUseOtherPaperdollScroll, oid)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCUseOtherPaperdollScroll, oid)
+
 }
 
 func TargetID() <-chan uint32 {
-	p := NewUint32Packet(72)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(72)
+
+	return p.Out
 }
 
 func CancelTarget() {
-	p := NewVoidPacket(73)
-	p.send(senderFunc)
+	n.NewVoidPacket(73)
+
 }
 
 func TargetToObject(ObjectID uint32) {
-	p := NewVoidPacket(74, ObjectID)
-	p.send(senderFunc)
+	n.NewVoidPacket(74, ObjectID)
+
 }
 
 func TargetToXYZ(x, y uint16, z byte) {
-	p := NewVoidPacket(SCTargetToXYZ, x, y, z)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCTargetToXYZ, x, y, z)
+
 }
 
 func TargetToTile(tileModel, x, y uint16, z byte) {
-	p := NewVoidPacket(SCTargetToTile, x, y, z)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCTargetToTile, x, y, z)
+
 }
 
 func WaitTargetObject(ObjID uint32) {
-	p := NewVoidPacket(77, ObjID)
-	p.send(senderFunc)
+	n.NewVoidPacket(77, ObjID)
+
 }
 
 func WaitTargetTile(tile, x, y uint16, z byte) {
-	p := NewVoidPacket(SCWaitTargetTile, tile, x, y, z)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCWaitTargetTile, tile, x, y, z)
+
 }
 
 func WaitTargetXYZ(x, y uint16, z byte) {
-	p := NewVoidPacket(SCWaitTargetXYZ, x, y, z)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCWaitTargetXYZ, x, y, z)
+
 }
 
 func WaitTargetSelf() {
-	p := NewVoidPacket(80)
-	p.send(senderFunc)
+	n.NewVoidPacket(80)
+
 }
 
 func WaitTargetType(ObjType uint16) {
-	p := NewVoidPacket(81, ObjType)
-	p.send(senderFunc)
+	n.NewVoidPacket(81, ObjType)
+
 }
 
 func CancelWaitTarget() {
-	p := NewVoidPacket(82)
-	p.send(senderFunc)
+	n.NewVoidPacket(82)
+
 }
 
 func WaitTargetGround(ObjType uint16) {
-	p := NewVoidPacket(83, ObjType)
-	p.send(senderFunc)
+	n.NewVoidPacket(83, ObjType)
+
 }
 
 func WaitTargetLast() {
-	p := NewVoidPacket(84)
-	p.send(senderFunc)
+	n.NewVoidPacket(84)
+
 }
 
 func UsePrimaryAbility() {
-	p := NewVoidPacket(85)
-	p.send(senderFunc)
+	n.NewVoidPacket(85)
+
 }
 
 func UseSecondaryAbility() {
-	p := NewVoidPacket(86)
-	p.send(senderFunc)
+	n.NewVoidPacket(86)
+
 }
 
 func GetActiveAbility() <-chan string {
-	p := NewStringPacket(87)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(87)
+
+	return p.Out
 }
 
 func ToggleFly() {
-	p := NewVoidPacket(88)
-	p.send(senderFunc)
+	n.NewVoidPacket(88)
+
 }
 
 func getSkillId(skillName string) <-chan uint32 {
-	p := NewUint32Packet(SCGetSkillID, skillName)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(c.SCGetSkillID, skillName)
+
+	return p.Out
 }
 
 func UseSkill(skillName string) {
-	p := NewVoidPacket(SCUseSkill, <-getSkillId(skillName))
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCUseSkill, <-getSkillId(skillName))
+
 }
 
 func ChangeSkillLockState(skillName string, skillState byte) {
-	p := NewVoidPacket(SCChangeSkillLockState, <-getSkillId(skillName), skillState)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCChangeSkillLockState, <-getSkillId(skillName), skillState)
+
 }
 
 func SetSkillLockState(skillName string, skillState byte) {
@@ -466,38 +476,38 @@ func SetSkillLockState(skillName string, skillState byte) {
 }
 
 func GetSkillCap(SkillName string) <-chan float64 {
-	p := NewFloatPacket(92, <-getSkillId(SkillName))
-	p.send(senderFunc)
-	return p.out
+	p := n.NewFloatPacket(92, <-getSkillId(SkillName))
+
+	return p.Out
 }
 func GetSkillValue(SkillName string) <-chan float64 {
-	p := NewFloatPacket(93, <-getSkillId(SkillName))
-	p.send(senderFunc)
-	return p.out
+	p := n.NewFloatPacket(93, <-getSkillId(SkillName))
+
+	return p.Out
 }
 func GetSkillCurrentValue(SkillName string) <-chan float64 {
-	p := NewFloatPacket(351, <-getSkillId(SkillName))
-	p.send(senderFunc)
-	return p.out
+	p := n.NewFloatPacket(351, <-getSkillId(SkillName))
+
+	return p.Out
 }
 
 func ReqVirtuesGump() {
-	p := NewVoidPacket(94)
-	p.send(senderFunc)
+	n.NewVoidPacket(94)
+
 }
 
 func UseVirtue(VirtueName string) {
-	if v, ok := _VIRTUES[VirtueName]; ok {
-		p := NewVoidPacket(95, v)
-		p.send(senderFunc)
+	if v, ok := c.VIRTUES[VirtueName]; ok {
+		n.NewVoidPacket(95, v)
+
 	} else {
 		log.Fatalf("Unknown virtue %v", VirtueName)
 	}
 }
 
 func Cast(spellName string) {
-	p := NewVoidPacket(SCCastSpell, _SPELLS[strings.ToLower(spellName)])
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCCastSpell, c.SPELLS[strings.ToLower(spellName)])
+
 }
 
 func CastToObj(spellName string, oid uint32) {
@@ -506,148 +516,148 @@ func CastToObj(spellName string, oid uint32) {
 }
 
 func IsActiveSpellAbility(spellName string) <-chan bool {
-	p := NewBoolPacket(SCIsActiveSpellAbility, _SPELLS[strings.ToLower(spellName)])
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(c.SCIsActiveSpellAbility, c.SPELLS[strings.ToLower(spellName)])
+
+	return p.Out
 }
 
 func UnsetCatchBag() {
-	p := NewVoidPacket(100)
-	p.send(senderFunc)
+	n.NewVoidPacket(100)
+
 }
 
 func SetCatchBag(ObjectID uint32) {
-	p := NewVoidPacket(99, ObjectID)
-	p.send(senderFunc)
+	n.NewVoidPacket(99, ObjectID)
+
 }
 
 func UseObject(ObjectID uint32) {
-	p := NewVoidPacket(101, ObjectID)
-	p.send(senderFunc)
+	n.NewVoidPacket(101, ObjectID)
+
 }
 
 func UseType(objType uint16, color uint16) <-chan uint32 {
-	p := NewUint32Packet(SCUseType, objType, color)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(c.SCUseType, objType, color)
+
+	return p.Out
 }
 
 func UseFromGround(objType, color uint16) <-chan uint32 {
-	p := NewUint32Packet(SCUseFromGround, objType, color)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(c.SCUseFromGround, objType, color)
+
+	return p.Out
 }
 
 func ClickOnObject(ObjectID uint32) {
-	p := NewVoidPacket(104, ObjectID)
-	p.send(senderFunc)
+	n.NewVoidPacket(104, ObjectID)
+
 }
 
 func FoundedParamID() <-chan uint32 {
-	p := NewUint32Packet(105)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(105)
+
+	return p.Out
 }
 
 func LineID() <-chan uint32 {
-	p := NewUint32Packet(106)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(106)
+
+	return p.Out
 }
 
 func LineType() <-chan uint16 {
-	p := NewUint16Packet(SCGetLineType)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(c.SCGetLineType)
+
+	return p.Out
 }
 
 func LineName() <-chan string {
-	p := NewStringPacket(114)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(114)
+
+	return p.Out
 }
 
 func LineTime() <-chan time.Time {
-	p := NewTimePacket(SCGetLineTime)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewTimePacket(c.SCGetLineTime)
+
+	return p.Out
 }
 
 func LineMsgType() <-chan byte {
-	p := NewBytePacket(SCGetLineMsgType)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBytePacket(c.SCGetLineMsgType)
+
+	return p.Out
 }
 
 func LineTextColor() <-chan uint16 {
-	p := NewUint16Packet(SCGetLineTextColor)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(c.SCGetLineTextColor)
+
+	return p.Out
 }
 
 func LineTextFont() <-chan uint16 {
-	p := NewUint16Packet(SCGetLineTextFont)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(c.SCGetLineTextFont)
+
+	return p.Out
 }
 
 func LineIndex() <-chan uint32 {
-	p := NewUint32Packet(112)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(112)
+
+	return p.Out
 }
 
 func LineCount() <-chan uint32 {
-	p := NewUint32Packet(113)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(113)
+
+	return p.Out
 }
 
 func AddJournalIgnore(str string) {
-	p := NewVoidPacket(115, str)
-	p.send(senderFunc)
+	n.NewVoidPacket(115, str)
+
 }
 
 func ClearJournalIgnore() {
-	p := NewVoidPacket(116)
-	p.send(senderFunc)
+	n.NewVoidPacket(116)
+
 }
 
 func AddChatUserIgnore(user string) {
-	p := NewVoidPacket(117, user)
-	p.send(senderFunc)
+	n.NewVoidPacket(117, user)
+
 }
 
 func AddToJournal(msg string) {
-	p := NewVoidPacket(304, msg)
-	p.send(senderFunc)
+	n.NewVoidPacket(304, msg)
+
 }
 
 func ClearChatUserIgnore() {
-	p := NewVoidPacket(118)
-	p.send(senderFunc)
+	n.NewVoidPacket(118)
+
 }
 
 func ClearJournal() {
-	p := NewVoidPacket(119)
-	p.send(senderFunc)
+	n.NewVoidPacket(119)
+
 }
 
 func ClearSystemJournal() {
-	p := NewVoidPacket(346)
-	p.send(senderFunc)
+	n.NewVoidPacket(346)
+
 }
 
 func LastJournalMessage() <-chan string {
-	p := NewStringPacket(120)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(120)
+
+	return p.Out
 }
 
 func InJournal(s string) <-chan int32 {
-	p := NewIntPacket(SCInJournal, s)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewIntPacket(c.SCInJournal, s)
+
+	return p.Out
 }
 
 // InJournalBetweenTimes
@@ -660,32 +670,32 @@ func InJournal(s string) <-chan int32 {
 // Returns if string is found - index of string starting from 0
 // if string is not found -1
 func InJournalBetweenTimes(str string, timeBegin time.Time, timeEnd time.Time) <-chan int32 {
-	p := NewIntPacket(SCInJournalBetweenTimes, str, timeBegin, timeEnd)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewIntPacket(c.SCInJournalBetweenTimes, str, timeBegin, timeEnd)
+
+	return p.Out
 }
 
 func Journal(stringIndex uint32) <-chan string {
-	p := NewStringPacket(SCJournal, stringIndex)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(c.SCJournal, stringIndex)
+
+	return p.Out
 }
 
 func SetJournalLine(stringIndex uint32, text string) {
-	p := NewVoidPacket(SCSetJournalLine, stringIndex, text)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCSetJournalLine, stringIndex, text)
+
 }
 
 func LowJournal() <-chan uint32 {
-	p := NewUint32Packet(125)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(125)
+
+	return p.Out
 }
 
 func HighJournal() <-chan uint32 {
-	p := NewUint32Packet(126)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(126)
+
+	return p.Out
 }
 
 func waitJournalLineType(startTime time.Time, str string, maxWaitTime time.Duration, t string) <-chan bool {
@@ -727,42 +737,42 @@ func WaitJournalLineSystem(startTime time.Time, str string, maxWaitTime time.Dur
 }
 
 func SetFindDistance(Value uint32) {
-	p := NewVoidPacket(127, Value)
-	p.send(senderFunc)
+	n.NewVoidPacket(127, Value)
+
 }
 
 func GetFindDistance() <-chan uint32 {
-	p := NewUint32Packet(128)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(128)
+
+	return p.Out
 }
 
 func SetFindVertical(Value uint32) {
-	p := NewVoidPacket(129, Value)
-	p.send(senderFunc)
+	n.NewVoidPacket(129, Value)
+
 }
 
 func GetFindVertical() <-chan uint32 {
-	p := NewUint32Packet(130)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(130)
+
+	return p.Out
 }
 
 func SetFindInNulPoint(v bool) {
-	p := NewVoidPacket(SCSetFindInNulPoint, v)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCSetFindInNulPoint, v)
+
 }
 
 func GetFindInNulPoint() <-chan bool {
-	p := NewBoolPacket(337)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(337)
+
+	return p.Out
 }
 
 func FindTypeEx(objType, objColor uint16, container uint32, inSub bool) <-chan uint32 {
-	p := NewUint32Packet(SCFindTypeEx, objType, objColor, container, inSub)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(c.SCFindTypeEx, objType, objColor, container, inSub)
+
+	return p.Out
 }
 
 func FindType(objType uint16, container uint32) <-chan uint32 {
@@ -780,151 +790,151 @@ func FindType(objType uint16, container uint32) <-chan uint32 {
 // FindTypesArrayEx([$29A, $29B, $190, $191, $25d, $25e, $192, $193, $25f, $260, $2ea, $2ec, $2ed, $84, $f6, $19, $db, $51, $7a, $2ee, $2e8, $2e9, $2eb, $117, $116, $115],[$FFFF],[Ground],false);
 // AddToSystemJournal('FindCount = ' + IntToStr(FindCount));
 func FindTypesArrayEx(objTypes, colors []uint16, containers []uint32, inSub bool) <-chan uint32 {
-	p := NewUint32Packet(SCFindTypesArrayEx, objTypes, colors, containers, inSub)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(c.SCFindTypesArrayEx, objTypes, colors, containers, inSub)
+
+	return p.Out
 }
 
 func FindNotoriety(objType uint16, notoriety byte) <-chan uint32 {
-	p := NewUint32Packet(SCFindNotoriety, objType, notoriety)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(c.SCFindNotoriety, objType, notoriety)
+
+	return p.Out
 }
 
 func FindAtCoord(x, y uint16) <-chan uint32 {
-	p := NewUint32Packet(SCFindAtCoord, x, y)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(c.SCFindAtCoord, x, y)
+
+	return p.Out
 
 }
 func Ignore(ObjID uint32) {
-	p := NewVoidPacket(134, ObjID)
-	p.send(senderFunc)
+	n.NewVoidPacket(134, ObjID)
+
 }
 
 func IgnoreOff(ObjID uint32) {
-	p := NewVoidPacket(135, ObjID)
-	p.send(senderFunc)
+	n.NewVoidPacket(135, ObjID)
+
 }
 
 func IgnoreReset() {
-	p := NewVoidPacket(136)
-	p.send(senderFunc)
+	n.NewVoidPacket(136)
+
 }
 
 func GetIgnoreList() <-chan []uint32 {
-	p := NewUint32ArrayPacket(SCGetIgnoreList)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32ArrayPacket(c.SCGetIgnoreList)
+
+	return p.Out
 }
 
 func GetFoundList() <-chan []uint32 {
-	p := NewUint32ArrayPacket(SCGetFindedList)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32ArrayPacket(c.SCGetFindedList)
+
+	return p.Out
 }
 
 func FindItem() <-chan uint32 {
-	p := NewUint32Packet(139)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(139)
+
+	return p.Out
 }
 
 func FindCount() <-chan uint32 {
-	p := NewUint32Packet(140)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(140)
+
+	return p.Out
 }
 
 func FindQuantity() <-chan uint32 {
-	p := NewUint32Packet(141)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(141)
+
+	return p.Out
 }
 
 func FindFullQuantity() <-chan uint32 {
-	p := NewUint32Packet(142)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(142)
+
+	return p.Out
 }
 
 func PredictedX() <-chan uint16 {
-	p := NewUint16Packet(143)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(143)
+
+	return p.Out
 }
 
 func PredictedY() <-chan uint16 {
-	p := NewUint16Packet(144)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(144)
+
+	return p.Out
 }
 
 func PredictedZ() <-chan byte {
-	p := NewBytePacket(SCPredictedZ)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBytePacket(c.SCPredictedZ)
+
+	return p.Out
 }
 
 func PredictedDirection() <-chan byte {
-	p := NewBytePacket(SCPredictedDirection)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBytePacket(c.SCPredictedDirection)
+
+	return p.Out
 }
 
 func GetX(oid uint32) <-chan uint16 {
-	p := NewUint16Packet(SCGetX, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(c.SCGetX, oid)
+
+	return p.Out
 }
 
 func GetY(oid uint32) <-chan uint16 {
-	p := NewUint16Packet(SCGetY, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(c.SCGetY, oid)
+
+	return p.Out
 }
 
 func GetZ(oid uint32) <-chan int8 {
-	p := NewInt8Packet(SCGetZ, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewInt8Packet(c.SCGetZ, oid)
+
+	return p.Out
 }
 
 func GetName(oid uint32) <-chan string {
-	p := NewStringPacket(SCGetName, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(c.SCGetName, oid)
+
+	return p.Out
 }
 
 func GetAltName(oid uint32) <-chan string {
-	p := NewStringPacket(SCGetAltName, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(c.SCGetAltName, oid)
+
+	return p.Out
 
 }
 
 func GetTitle(oid uint32) <-chan string {
-	p := NewStringPacket(SCGetTitle)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(c.SCGetTitle)
+
+	return p.Out
 }
 
 func GetTooltip(oid uint32) <-chan string {
-	p := NewStringPacket(SCGetCliloc, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(c.SCGetCliloc, oid)
+
+	return p.Out
 }
 
 func GetCliloc(oid uint32) <-chan string {
-	p := NewStringPacket(SCGetCliloc, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(c.SCGetCliloc, oid)
+
+	return p.Out
 }
 
 func GetType(oid uint32) <-chan uint16 {
-	p := NewUint16Packet(SCGetType, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(c.SCGetType, oid)
+
+	return p.Out
 }
 
 /*
@@ -949,236 +959,236 @@ func GetTooltipRec(ObjID){
     return result
 */
 func GetClilocByID(oid uint32) <-chan string {
-	p := NewStringPacket(SCGetClilocByID, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(c.SCGetClilocByID, oid)
+
+	return p.Out
 }
 
 func GetQuantity(oid uint32) <-chan int32 {
-	p := NewIntPacket(SCGetQuantity, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewIntPacket(c.SCGetQuantity, oid)
+
+	return p.Out
 }
 
 func IsObjectExists(oid uint32) <-chan bool {
-	p := NewBoolPacket(SCIsObjectExists, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(c.SCIsObjectExists, oid)
+
+	return p.Out
 }
 
 func IsNPC(oid uint32) <-chan bool {
-	p := NewBoolPacket(SCIsNPC, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(c.SCIsNPC, oid)
+
+	return p.Out
 }
 
 func GetPrice(oid uint32) <-chan uint32 {
-	p := NewUint32Packet(SCGetPrice, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(c.SCGetPrice, oid)
+
+	return p.Out
 }
 
 func GetDirection(oid uint32) <-chan byte {
-	p := NewBytePacket(SCGetDirection, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBytePacket(c.SCGetDirection, oid)
+
+	return p.Out
 }
 
 func GetDistance(oid uint32) <-chan int32 {
-	p := NewIntPacket(SCGetDistance, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewIntPacket(c.SCGetDistance, oid)
+
+	return p.Out
 }
 
 func GetColor(oid uint32) <-chan uint16 {
-	p := NewUint16Packet(SCGetColor, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(c.SCGetColor, oid)
+
+	return p.Out
 }
 
 func GetStr(oid uint32) <-chan int32 {
-	p := NewIntPacket(SCGetStr, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewIntPacket(c.SCGetStr, oid)
+
+	return p.Out
 }
 
 func GetInt(oid uint32) <-chan int32 {
-	p := NewIntPacket(SCGetInt, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewIntPacket(c.SCGetInt, oid)
+
+	return p.Out
 }
 
 func GetDex(oid uint32) <-chan int32 {
-	p := NewIntPacket(SCGetDex, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewIntPacket(c.SCGetDex, oid)
+
+	return p.Out
 }
 
 func GetHP(oid uint32) <-chan int32 {
-	p := NewIntPacket(SCGetHP, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewIntPacket(c.SCGetHP, oid)
+
+	return p.Out
 }
 
 func GetMaxHP(oid uint32) <-chan int32 {
-	p := NewIntPacket(SCGetMaxHP, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewIntPacket(c.SCGetMaxHP, oid)
+
+	return p.Out
 }
 
 func GetMana(oid uint32) <-chan int32 {
-	p := NewIntPacket(SCGetMana, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewIntPacket(c.SCGetMana, oid)
+
+	return p.Out
 }
 
 func GetMaxMana(ObjID uint32) <-chan int32 {
-	p := NewIntPacket(166, ObjID)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewIntPacket(166, ObjID)
+
+	return p.Out
 }
 
 func GetStam(oid uint32) <-chan int32 {
-	p := NewIntPacket(SCGetStam, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewIntPacket(c.SCGetStam, oid)
+
+	return p.Out
 }
 func GetMaxStam(ObjID uint32) <-chan int32 {
-	p := NewIntPacket(168, ObjID)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewIntPacket(168, ObjID)
+
+	return p.Out
 }
 
 func GetNotoriety(oid uint32) <-chan byte {
-	p := NewBytePacket(SCGetNotoriety)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBytePacket(c.SCGetNotoriety)
+
+	return p.Out
 }
 
 func GetParent(oid uint32) <-chan uint32 {
-	p := NewUint32Packet(SCGetParent, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(c.SCGetParent, oid)
+
+	return p.Out
 }
 
 func IsWarMode(oid uint32) <-chan bool {
-	p := NewBoolPacket(SCIsWarMode, oid)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(c.SCIsWarMode, oid)
+
+	return p.Out
 }
 
 func IsDead(ObjID uint32) <-chan bool {
-	p := NewBoolPacket(173, ObjID)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(173, ObjID)
+
+	return p.Out
 }
 
 func IsRunning(ObjID uint32) <-chan bool {
-	p := NewBoolPacket(174, ObjID)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(174, ObjID)
+
+	return p.Out
 }
 
 func IsContainer(ObjID uint32) <-chan bool {
-	p := NewBoolPacket(175, ObjID)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(175, ObjID)
+
+	return p.Out
 }
 
 func IsHidden(ObjID uint32) <-chan bool {
-	p := NewBoolPacket(176, ObjID)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(176, ObjID)
+
+	return p.Out
 }
 
 func IsMovable(ObjID uint32) <-chan bool {
-	p := NewBoolPacket(177, ObjID)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(177, ObjID)
+
+	return p.Out
 }
 
 func IsYellowHits(ObjID uint32) <-chan bool {
-	p := NewBoolPacket(178, ObjID)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(178, ObjID)
+
+	return p.Out
 }
 
 func IsPoisoned(ObjID uint32) <-chan bool {
-	p := NewBoolPacket(179, ObjID)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(179, ObjID)
+
+	return p.Out
 }
 
 func IsParalyzed(ObjID uint32) <-chan bool {
-	p := NewBoolPacket(180, ObjID)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(180, ObjID)
+
+	return p.Out
 }
 
 func IsFemale(ObjID uint32) <-chan bool {
-	p := NewBoolPacket(181, ObjID)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(181, ObjID)
+
+	return p.Out
 }
 
 func OpenDoor() {
-	p := NewVoidPacket(182)
-	p.send(senderFunc)
+	n.NewVoidPacket(182)
+
 }
 
 func Bow() {
-	p := NewVoidPacket(183)
-	p.send(senderFunc)
+	n.NewVoidPacket(183)
+
 }
 
 func Salute() {
-	p := NewVoidPacket(184)
-	p.send(senderFunc)
+	n.NewVoidPacket(184)
+
 }
 
 func GetPickupedItem() <-chan uint32 {
-	p := NewUint32Packet(185)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(185)
+
+	return p.Out
 }
 
 func SetPickupedItem(ID uint32) {
-	p := NewVoidPacket(186, ID)
-	p.send(senderFunc)
+	n.NewVoidPacket(186, ID)
+
 }
 
 func GetDropCheckCoord() <-chan bool {
-	p := NewBoolPacket(187)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(187)
+
+	return p.Out
 }
 
 func SetDropCheckCoord(value bool) {
-	p := NewVoidPacket(SCSetDropCheckCoord)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCSetDropCheckCoord)
+
 }
 
 func GetDropDelay() <-chan uint32 {
-	p := NewUint32Packet(189)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(189)
+
+	return p.Out
 }
 
 func SetDropDelay(Value uint32) {
-	p := NewVoidPacket(190, Value)
-	p.send(senderFunc)
+	n.NewVoidPacket(190, Value)
+
 }
 
 func DragItem(oid uint32, count int32) <-chan bool {
-	p := NewBoolPacket(SCDragItem, oid, count)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(c.SCDragItem, oid, count)
+
+	return p.Out
 }
 
 func DropItem(container uint32, x, y, z int32) <-chan bool {
-	p := NewBoolPacket(SCDropItem, container, x, y, z)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(c.SCDropItem, container, x, y, z)
+
+	return p.Out
 }
 
 func MoveItem(itemID uint32, count int32, container uint32, x, y, z int32) <-chan bool {
@@ -1245,13 +1255,13 @@ func EmptyContainer(container, destContainer, delayMs uint32) <-chan bool {
 }
 
 func RequestContextMenu(ID uint32) {
-	p := NewVoidPacket(193, ID)
-	p.send(senderFunc)
+	n.NewVoidPacket(193, ID)
+
 }
 
 func SetContextMenuHook(menuID uint32, entryNumber byte) {
-	p := NewVoidPacket(SCSetContextMenuHook, menuID, entryNumber)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCSetContextMenuHook, menuID, entryNumber)
+
 }
 
 /*
@@ -1286,83 +1296,83 @@ func GetContextMenuRec(){
     return None
 */
 func ClearContextMenu() {
-	p := NewVoidPacket(196)
-	p.send(senderFunc)
+	n.NewVoidPacket(196)
+
 }
 
 func IsTrade() <-chan bool {
-	p := NewBoolPacket(197)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(197)
+
+	return p.Out
 }
 
 func GetTradeContainer(tradeNum, num byte) <-chan uint32 {
-	p := NewUint32Packet(SCGetTradeContainer, tradeNum, num)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(c.SCGetTradeContainer, tradeNum, num)
+
+	return p.Out
 
 }
 
 func GetTradeOpponent(tradeNum byte) <-chan uint32 {
-	p := NewUint32Packet(SCGetTradeOpponent, tradeNum)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(c.SCGetTradeOpponent, tradeNum)
+
+	return p.Out
 }
 
 func TradeCount() <-chan byte {
-	p := NewBytePacket(SCGetTradeCount)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBytePacket(c.SCGetTradeCount)
+
+	return p.Out
 }
 
 func GetTradeOpponentName(tradeNum byte) <-chan string {
-	p := NewStringPacket(SCGetTradeOpponentName, tradeNum)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(c.SCGetTradeOpponentName, tradeNum)
+
+	return p.Out
 }
 
 func TradeCheck(tradeNum, num byte) <-chan bool {
-	p := NewBoolPacket(SCTradeCheck, tradeNum, num)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(c.SCTradeCheck, tradeNum, num)
+
+	return p.Out
 }
 
 func ConfirmTrade(tradeNum byte) {
-	p := NewVoidPacket(SCConfirmTrade, tradeNum)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCConfirmTrade, tradeNum)
+
 }
 
 func CancelTrade(tradeNum byte) <-chan bool {
-	p := NewBoolPacket(SCCancelTrade, tradeNum)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(c.SCCancelTrade, tradeNum)
+
+	return p.Out
 }
 
 func WaitMenu(menuCaption, elementCaption string) {
-	p := NewVoidPacket(SCWaitMenu, menuCaption, elementCaption)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCWaitMenu, menuCaption, elementCaption)
+
 }
 
 func AutoMenu(menuCaption, elementCaption string) {
-	p := NewVoidPacket(SCAutoMenu, menuCaption, elementCaption)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCAutoMenu, menuCaption, elementCaption)
+
 }
 
 func MenuHookPresent() <-chan bool {
-	p := NewBoolPacket(207)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(207)
+
+	return p.Out
 }
 
 func MenuPresent() <-chan bool {
-	p := NewBoolPacket(208)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(208)
+
+	return p.Out
 }
 
 func CancelMenu() {
-	p := NewVoidPacket(209)
-	p.send(senderFunc)
+	n.NewVoidPacket(209)
+
 }
 
 func CancelAllMenuHooks() {
@@ -1370,8 +1380,8 @@ func CancelAllMenuHooks() {
 }
 
 func CloseMenu() {
-	p := NewVoidPacket(210)
-	p.send(senderFunc)
+	n.NewVoidPacket(210)
+
 }
 
 /*
@@ -1393,7 +1403,7 @@ func GetMenu(MenuCaption){
     return result
 func GetMenuItems(MenuCaption){
     p :=
-p.send(senderFunc)
+
 // return '\n'.join(GetMenu(MenuCaption))
 }
 _get_last_menu = _ScriptMethod(339)  # GetLastMenuItems
@@ -1413,68 +1423,68 @@ func GetLastMenu(){
     return result
 func GetLastMenuItems(){
     p :=
-p.send(senderFunc)
+
 // return '\n'.join(GetLastMenu())
 }
 */
 
 func WaitGump(value int32) {
-	p := NewVoidPacket(SCWaitGumpInt, value)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCWaitGumpInt, value)
+
 }
 
 func WaitTextEntry(value string) {
-	p := NewVoidPacket(212, value)
-	p.send(senderFunc)
+	n.NewVoidPacket(212, value)
+
 }
 
 func GumpAutoTextEntry(textEntryID int32, value string) {
-	p := NewVoidPacket(SCGumpAutoTextEntry, textEntryID, value)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCGumpAutoTextEntry, textEntryID, value)
+
 }
 
 func GumpAutoRadiobutton(radiobuttonID, value int32) {
-	p := NewVoidPacket(SCGumpAutoRadiobutton, radiobuttonID, value)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCGumpAutoRadiobutton, radiobuttonID, value)
+
 }
 
 func GumpAutoCheckBox(checkBoxID, value int32) {
-	p := NewVoidPacket(SCGumpAutoCheckBox, checkBoxID, value)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCGumpAutoCheckBox, checkBoxID, value)
+
 }
 
 func NumGumpButton(gumpIndex uint16, value int32) <-chan bool {
-	p := NewBoolPacket(SCNumGumpButton, gumpIndex, value)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(c.SCNumGumpButton, gumpIndex, value)
+
+	return p.Out
 }
 
 func NumGumpTextEntry(gumpIndex uint16, textEntryID int32, value string) <-chan bool {
-	p := NewBoolPacket(SCNumGumpTextEntry, gumpIndex, textEntryID, value)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(c.SCNumGumpTextEntry, gumpIndex, textEntryID, value)
+
+	return p.Out
 }
 
 func NumGumpRadiobutton(gumpIndex uint16, radiobuttonID, value int32) <-chan bool {
-	p := NewBoolPacket(SCNumGumpRadiobutton, gumpIndex, radiobuttonID, value)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(c.SCNumGumpRadiobutton, gumpIndex, radiobuttonID, value)
+
+	return p.Out
 }
 func NumGumpCheckBox(gumpIndex uint16, checkBoxID, value int32) <-chan bool {
-	p := NewBoolPacket(SCNumGumpCheckBox, gumpIndex, checkBoxID, value)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(c.SCNumGumpCheckBox, gumpIndex, checkBoxID, value)
+
+	return p.Out
 }
 
 func GetGumpsCount() <-chan uint16 {
-	p := NewUint16Packet(220)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(220)
+
+	return p.Out
 }
 
 func CloseSimpleGump(GumpIndex uint16) {
-	p := NewVoidPacket(221, GumpIndex)
-	p.send(senderFunc)
+	n.NewVoidPacket(221, GumpIndex)
+
 }
 
 func IsGump() bool {
@@ -1482,21 +1492,21 @@ func IsGump() bool {
 }
 
 func GetGumpSerial(gumpIndex uint16) <-chan uint32 {
-	p := NewUint32Packet(SCGetGumpSerial, gumpIndex)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(c.SCGetGumpSerial, gumpIndex)
+
+	return p.Out
 }
 
 func GetGumpID(gumpIndex uint16) <-chan uint32 {
-	p := NewUint32Packet(SCGetGumpID, gumpIndex)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(c.SCGetGumpID, gumpIndex)
+
+	return p.Out
 }
 
 func IsGumpCanBeClosed(gumpIndex uint16) <-chan bool {
-	p := NewBoolPacket(SCGetGumpNoClose, gumpIndex)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(c.SCGetGumpNoClose, gumpIndex)
+
+	return p.Out
 }
 
 /*
@@ -1718,18 +1728,18 @@ func GetGumpInfo(GumpIndex){
     return result
 */
 func AddGumpIgnoreByID(ID uint32) {
-	p := NewVoidPacket(230, ID)
-	p.send(senderFunc)
+	n.NewVoidPacket(230, ID)
+
 }
 
 func AddGumpIgnoreBySerial(Serial uint32) {
-	p := NewVoidPacket(231, Serial)
-	p.send(senderFunc)
+	n.NewVoidPacket(231, Serial)
+
 }
 
 func ClearGumpsIgnore() {
-	p := NewVoidPacket(232)
-	p.send(senderFunc)
+	n.NewVoidPacket(232)
+
 }
 
 func RhandLayer() byte {
@@ -1839,9 +1849,9 @@ func BankLayer() byte {
 }
 
 func ObjAtLayerEx(layerType byte, playerID uint32) <-chan uint32 {
-	p := NewUint32Packet(SCObjAtLayerEx, layerType, playerID)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(c.SCObjAtLayerEx, layerType, playerID)
+
+	return p.Out
 }
 
 func ObjAtLayer(LayerType byte) <-chan uint32 {
@@ -1849,14 +1859,14 @@ func ObjAtLayer(LayerType byte) <-chan uint32 {
 }
 
 func GetLayer(Obj uint32) <-chan byte {
-	p := NewBytePacket(SCGetLayer)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBytePacket(c.SCGetLayer)
+
+	return p.Out
 }
 
 func WearItem(layer byte, oid uint32) {
-	p := NewVoidPacket(SCWearItem, layer, oid)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCWearItem, layer, oid)
+
 }
 
 /*
@@ -1869,7 +1879,7 @@ func Disarm(){
         if item:
             tmp.append(MoveItem(item, 1, backpack, 0, 0, 0))
     p :=
-p.send(senderFunc)
+
 // return all(tmp)
 func disarm(){
     return Disarm()
@@ -1878,12 +1888,12 @@ func Equip(Layer, Obj){
     if Layer and DragItem(Obj, 1):
 }
         p :=
-p.send(senderFunc)
+
 // return WearItem(Layer, Obj)
     return False
 func equip(Layer, Obj){
     p :=
-p.send(senderFunc)
+
 // return Equip(Layer, Obj)
 }
 func Equipt(Layer, ObjType){
@@ -1891,12 +1901,12 @@ func Equipt(Layer, ObjType){
 }
     if item:
         p :=
-p.send(senderFunc)
+
 // return Equip(Layer, item)
     return False
 func equipt(Layer, ObjType){
     p :=
-p.send(senderFunc)
+
 // return Equipt(Layer, ObjType)
 }
 func UnEquip(Layer){
@@ -1904,25 +1914,25 @@ func UnEquip(Layer){
 }
     if item:
         p :=
-p.send(senderFunc)
+
 // return MoveItem(item, 1, Backpack(), 0, 0, 0)
     return False
 */
 func GetDressSpeed() <-chan uint16 {
-	p := NewUint16Packet(236)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(236)
+
+	return p.Out
 }
 
 func SetDressSpeed(Value uint16) {
-	p := NewVoidPacket(237, Value)
-	p.send(senderFunc)
+	n.NewVoidPacket(237, Value)
+
 }
 
 func GetClientVersionInt() <-chan uint32 {
-	p := NewUint32Packet(355)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(355)
+
+	return p.Out
 }
 
 /*
@@ -1932,8 +1942,8 @@ _wearable_layers = (RhandLayer(), LhandLayer(), ShoesLayer(), PantsLayer(),
                     TorsoHLayer(), EarLayer(), ArmsLayer(), CloakLayer(),
 */
 func UnequipItemsSetMacro() {
-	p := NewVoidPacket(356)
-	p.send(senderFunc)
+	n.NewVoidPacket(356)
+
 }
 
 /*
@@ -1955,17 +1965,17 @@ func Undress(){
         tmp.append(True)
     # no need to wait - all this done inside
     p :=
-p.send(senderFunc)
+
 // return all(tmp)
 */
 func SetDress() {
-	p := NewVoidPacket(238)
-	p.send(senderFunc)
+	n.NewVoidPacket(238)
+
 }
 
 func EquipItemsSetMacro() {
-	p := NewVoidPacket(357)
-	p.send(senderFunc)
+	n.NewVoidPacket(357)
+
 }
 
 /*
@@ -1992,7 +2002,7 @@ func EquipDressSet(){
         res.append(True)
     # no need to wait - all this done inside
     p :=
-p.send(senderFunc)
+
 // return all(res)
 func DressSavedSet(){
     EquipDressSet()
@@ -2056,107 +2066,118 @@ func SSCount() <-chan uint32 {
 }
 
 func AutoBuy(itemType, itemColor, quantity uint16) {
-	p := NewVoidPacket(SCAutoBuy, itemType, itemColor, quantity)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCAutoBuy, itemType, itemColor, quantity)
+
 }
 
 func GetShopList() <-chan []string {
-	p := NewGetShopListPacket()
-	p.send(senderFunc)
-	return p.out
+	p := n.NewGetShopListPacket()
+
+	return p.Out
 }
 
 func ClearShopList() {
-	p := NewVoidPacket(242)
-	p.send(senderFunc)
+	n.NewVoidPacket(242)
+
 }
 
 func AutoBuyEx(itemType, itemColor, quantity uint16, price uint32, itemName string) {
-	p := NewVoidPacket(SCAutoBuyEx, itemType, itemColor, itemName, quantity, price, itemName)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCAutoBuyEx, itemType, itemColor, itemName, quantity, price, itemName)
+
 }
 
 func GetAutoBuyDelay() <-chan uint16 {
-	p := NewUint16Packet(244)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(244)
+
+	return p.Out
 }
 
 func SetAutoBuyDelay(Value uint16) {
-	p := NewVoidPacket(245, Value)
-	p.send(senderFunc)
+	n.NewVoidPacket(245, Value)
+
 }
 
 func GetAutoSellDelay() <-chan uint16 {
-	p := NewUint16Packet(246)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(246)
+
+	return p.Out
 }
 
 func SetAutoSellDelay(Value uint16) {
-	p := NewVoidPacket(247, Value)
-	p.send(senderFunc)
+	n.NewVoidPacket(247, Value)
+
 }
 
 func AutoSell(itemType, itemColor, quantity uint16) {
-	p := NewVoidPacket(SCAutoSell, itemType, itemColor, quantity)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCAutoSell, itemType, itemColor, quantity)
+
 }
 func RequestStats(ObjID uint32) {
-	p := NewVoidPacket(249, ObjID)
-	p.send(senderFunc)
+	n.NewVoidPacket(249, ObjID)
+
 }
 
 func HelpRequest() {
-	p := NewVoidPacket(250)
-	p.send(senderFunc)
+	n.NewVoidPacket(250)
+
 }
 
 func QuestRequest() {
-	p := NewVoidPacket(251)
-	p.send(senderFunc)
+	n.NewVoidPacket(251)
+
 }
 
 func RenameMobile(mobId uint32, newName string) {
-	p := NewVoidPacket(SCRenameMobile, mobId, newName)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCRenameMobile, mobId, newName)
+
 }
 
 func MobileCanBeRenamed(Mob_ID uint32) <-chan bool {
-	p := NewBoolPacket(253, Mob_ID)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(253, Mob_ID)
+
+	return p.Out
 }
 
 func SetStatState(statNum, statState byte) {
-	p := NewVoidPacket(254, statNum, statState)
-	p.send(senderFunc)
+	n.NewVoidPacket(254, statNum, statState)
+
 }
 
 func GetStaticArtBitmap(id uint32, hue uint16) <-chan []byte {
-	p := NewByteArrayPacket(SCGetStaticArtBitmap, id, hue)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewByteArrayPacket(c.SCGetStaticArtBitmap, id, hue)
+
+	return p.Out
 }
 
 func PrintScriptMethodsList(fileName string, sortedList bool) {
-	p := NewVoidPacket(256, fileName, sortedList)
-	p.send(senderFunc)
+	n.NewVoidPacket(256, fileName, sortedList)
+
 }
 
 func Alarm() {
-	p := NewVoidPacket(257)
-	p.send(senderFunc)
+	n.NewVoidPacket(257)
+
 }
 
 func UOSay(text string) {
-	p := NewVoidPacket(308, text)
-	p.send(senderFunc)
+	n.NewVoidPacket(308, text)
+
 }
 
 func UOSayColor(text string, color uint16) {
-	p := NewVoidPacket(309, text, color)
-	p.send(senderFunc)
+	n.NewVoidPacket(309, text, color)
+
+}
+
+func SetGlobal(varRegion byte, varName, varValue string) {
+	n.NewVoidPacket(c.SCSetGlobal, varRegion, varName, varValue)
+
+}
+
+func GetGlobal(varRegion byte, varName string) <-chan string {
+	p := n.NewStringPacket(c.SCGetGlobal, varRegion, varName)
+
+	return p.Out
 }
 
 /*
@@ -2187,24 +2208,24 @@ func GetGlobal(GlobalRegion, VarName){
     for region in _reg_stealth, _reg_char:
         if GlobalRegion in region:
             p :=
-p.send(senderFunc)
+
 // return _get_global(region[0], VarName)
     else:
         raise ValueError('GlobalRegion must be "stealth" or "char".')
 */
 func ConsoleEntryReply(text string) {
-	p := NewVoidPacket(312, text)
-	p.send(senderFunc)
+	n.NewVoidPacket(312, text)
+
 }
 func ConsoleEntryUnicodeReply(text string) {
-	p := NewVoidPacket(313, text)
-	p.send(senderFunc)
+	n.NewVoidPacket(313, text)
+
 }
 
 func GameServerIPString() <-chan string {
-	p := NewStringPacket(341)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(341)
+
+	return p.Out
 }
 
 /*
@@ -2261,71 +2282,71 @@ func EUO2StealthID(EUO){
 */
 
 func InviteToParty(ID uint32) {
-	p := NewVoidPacket(262, ID)
-	p.send(senderFunc)
+	n.NewVoidPacket(262, ID)
+
 }
 
 func RemoveFromParty(ID uint32) {
-	p := NewVoidPacket(263, ID)
-	p.send(senderFunc)
+	n.NewVoidPacket(263, ID)
+
 }
 
 func PartyMessageTo(oid uint32, msg string) {
-	p := NewVoidPacket(SCPartyMessageTo, msg)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCPartyMessageTo, msg)
+
 }
 
 func PartySay(msg string) {
-	p := NewVoidPacket(265, msg)
-	p.send(senderFunc)
+	n.NewVoidPacket(265, msg)
+
 }
 
 func PartyCanLootMe(value bool) {
-	p := NewVoidPacket(SCPartyCanLootMe, value)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCPartyCanLootMe, value)
+
 }
 
 func PartyAcceptInvite() {
-	p := NewVoidPacket(267)
-	p.send(senderFunc)
+	n.NewVoidPacket(267)
+
 }
 
 func PartyDeclineInvite() {
-	p := NewVoidPacket(268)
-	p.send(senderFunc)
+	n.NewVoidPacket(268)
+
 }
 
 func PartyLeave() {
-	p := NewVoidPacket(269)
-	p.send(senderFunc)
+	n.NewVoidPacket(269)
+
 }
 
 func InParty() <-chan bool {
-	p := NewBoolPacket(271)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(271)
+
+	return p.Out
 }
 
 func PartyMembersList() <-chan []uint32 {
-	p := NewUint32ArrayPacket(SCPartyMembersList)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32ArrayPacket(c.SCPartyMembersList)
+
+	return p.Out
 }
 
 func ICQConnected() <-chan bool {
-	p := NewBoolPacket(272)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(272)
+
+	return p.Out
 }
 
 func ICQConnect(UIN uint32, password string) {
-	p := NewVoidPacket(273, UIN, password)
-	p.send(senderFunc)
+	n.NewVoidPacket(273, UIN, password)
+
 }
 
 func ICQDisconnect() {
-	p := NewVoidPacket(274)
-	p.send(senderFunc)
+	n.NewVoidPacket(274)
+
 }
 
 /*
@@ -2357,7 +2378,7 @@ func MessengerGetConnected(MesID){
         error = 'MessengerGetConnected: MesID must be "Telegram", "Viber" or "Discord"'
         raise ValueError(error)
     p :=
-p.send(senderFunc)
+
 // return _messenger_get_connected(_messengers[MesID])
 _messenger_set_connected = _ScriptMethod(502)  # Messenger_SetConnected
 _messenger_set_connected.argtypes = [_ubyte,  # MesID
@@ -2377,7 +2398,7 @@ func MessengerGetToken(MesID){
         error = 'MessengerGetConnected: MesID must be "Telegram", "Viber" or "Discord"'
         raise ValueError(error)
     p :=
-p.send(senderFunc)
+
 // return _messenger_get_token(_messengers[MesID])
 _messenger_set_token = _ScriptMethod(504)  # Messenger_SetToken
 _messenger_set_token.argtypes = [_ubyte,  # MesID
@@ -2397,7 +2418,7 @@ func MessengerGetName(MesID){
         error = 'MessengerGetConnected: MesID must be "Telegram", "Viber" or "Discord"'
         raise ValueError(error)
     p :=
-p.send(senderFunc)
+
 // return _messenger_get_name(_messengers[MesID])
 _messenger_send_message = _ScriptMethod(506)  # Messenger_SendMessage
 _messenger_send_message.argtypes = [_ubyte,  # MesID
@@ -2410,18 +2431,20 @@ func MessengerSendMessage(MesID, Msg, UserID){
         raise ValueError(error)
     _messenger_send_message(_messengers[MesID], Msg, UserID)
 _tile_groups = {0: 0, 'tfLand': 0, 'tfland': 0, 'Land': 0, 'land': 0,
-                1: 1, 'tfStatic': 1, 'tfstatic': 1, 'Static': 1, 'static': 1}_get_tile_flags = _ScriptMethod(278)  # GetTileFlags
+                1: 1, 'tfStatic': 1, 'tfstatic': 1, 'Static': 1, 'static': 1}
+
+_get_tile_flags = _ScriptMethod(278)  # GetTileFlags
 _get_tile_flags.restype = _uint
 _get_tile_flags.argtypes = [_ubyte,  # TileGroup
                             _ushort]  # Tile
-func GetTileFlags(TileGroup, Tile){
-    if TileGroup not in _tile_groups.keys():
+*/
+func GetTileFlags(tileGroup byte, tile uint32) <-chan uint32 {
+	p := n.NewUint32Packet(c.SCGetTileFlags, tileGroup, tile)
+
+	return p.Out
 }
-        raise ValueError('GetTileFlags: TileGroup must be "Land" or "Static"')
-    group = _tile_groups[TileGroup]
-    p :=
-p.send(senderFunc)
-// return _get_tile_flags(group, Tile)
+
+/*
 _uint_to_flags = _ScriptMethod(350)  # ConvertIntegerToFlags
 _uint_to_flags.restype = _buffer
 _uint_to_flags.argtypes = [_ubyte,  # Group
@@ -2481,39 +2504,36 @@ _get_cell.restype = _buffer  # TMapCell
 _get_cell.argtypes = [_ushort,  # X
                       _ushort,  # Y
                       _ubyte]  # WorldNum
-func GetCell(X, Y, WorldNum){
-    result = {}
-}
-    data = _get_cell(X, Y, WorldNum)
-    if data:
-        fmt = '<Hb'
-        keys = 'Tile', 'Z'
-        values = _struct.unpack(fmt, data)
-        result.update(zip(keys, values))
-    return result
 */
-func GetLayerCount(x, y uint16, worldNum byte) <-chan byte {
-	p := NewBytePacket(SCGetLayerCount, x, y, worldNum)
-	p.send(senderFunc)
-	return p.out
+
+func GetCell(x, y uint16, worldNum byte) <-chan m.MapCell {
+	p := n.NewGetMapCellPacket(x, y, worldNum)
+
+	return p.Out
 }
 
-func ReadStaticsXY(x, y uint16, wnum byte) <-chan []StaticsXY {
-	p := NewReadStaticsXYPacket(x, y, wnum)
-	p.send(senderFunc)
-	return p.out
+func GetLayerCount(x, y uint16, worldNum byte) <-chan byte {
+	p := n.NewBytePacket(c.SCGetLayerCount, x, y, worldNum)
+
+	return p.Out
+}
+
+func ReadStaticsXY(x, y uint16, wnum byte) <-chan []m.StaticsXY {
+	p := n.NewReadStaticsXYPacket(x, y, wnum)
+
+	return p.Out
 }
 
 func GetSurfaceZ(x, y uint16, worldNum byte) <-chan byte {
-	p := NewBytePacket(SCGetSurfaceZ, x, y, worldNum)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBytePacket(c.SCGetSurfaceZ, x, y, worldNum)
+
+	return p.Out
 }
 
-func IsWorldCellPassable(currX, currY uint16, currZ int8, destX, destY uint16, worldNum byte) <-chan WorldCellPassable {
-	p := NewIsWorldCellPassablePacket(currX, currY, currZ, destX, destY, worldNum)
-	p.send(senderFunc)
-	return p.out
+func IsWorldCellPassable(currX, currY uint16, currZ int8, destX, destY uint16, worldNum byte) <-chan m.WorldCellPassable {
+	p := n.NewIsWorldCellPassablePacket(currX, currY, currZ, destX, destY, worldNum)
+
+	return p.Out
 }
 
 /*
@@ -2526,21 +2546,14 @@ _get_statics_array.argtypes = [_ushort,  # Xmin
                                _ubyte,  # WorldNum
                                _uint,  # Len
                                _buffer]  # TileTypes: Array of Word
-func GetStaticTilesArray(Xmin, Ymin, Xmax, Ymax, WorldNum, TileTypes){
-    if not _iterable(TileTypes):
+*/
+func GetStaticTilesArray(xmin, ymin, xmax, ymax uint16, worldNum byte, tileTypes []uint16) <-chan []m.FoundTile {
+	p := n.NewGetStaticTilesArrayPacket(xmin, ymin, xmax, ymax, worldNum, tileTypes)
+
+	return p.Out
 }
-        TileTypes = [TileTypes]
-    result = []
-    data = _get_statics_array(
-        Xmin, Ymin, Xmax, Ymax, WorldNum, len(TileTypes),
-        _struct.pack('<' + 'H' * len(TileTypes), *TileTypes)
-    )
-    count = _uint.from_buffer(data)
-    fmt = '<3Hb'
-    size = _struct.calcsize(fmt)
-    for i in range(count):
-        result.append(_struct.unpack_from(fmt, data, count.size + i * size))
-    return result
+
+/*
 _get_lands_array = _ScriptMethod(287)  # GetLandTilesArray
 _get_lands_array.restype = _buffer  # Array of TFoundTile
 _get_lands_array.argtypes = [_ushort,  # Xmin
@@ -2567,13 +2580,13 @@ func GetLandTilesArray(Xmin, Ymin, Xmax, Ymax, WorldNum, TileTypes){
     return result
 */
 func ClientPrint(text string) {
-	p := NewVoidPacket(289, text)
-	p.send(senderFunc)
+	n.NewVoidPacket(289, text)
+
 }
 
 func ClientPrintEx(senderID uint32, color, font uint16, text string) {
-	p := NewVoidPacket(SCClientPrintEx, senderID, color, font, text)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCClientPrintEx, senderID, color, font, text)
+
 }
 
 /*
@@ -2593,81 +2606,85 @@ func CloseClientUIWindow(UIWindowType, ID){
     _close_client_ui_window(_wnd[UIWindowType], ID)
 */
 func ClientRequestObjectTarget() {
-	p := NewVoidPacket(292)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCClientRequestObjectTarget)
+
 }
 
 func ClientRequestTileTarget() {
-	p := NewVoidPacket(293)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCClientRequestTileTarget)
+
 }
 
 func ClientTargetResponsePresent() <-chan bool {
-	p := NewBoolPacket(294)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(294)
+
+	return p.Out
 }
 
-/*
-_client_target_response = _ScriptMethod(295)  # ClientTargetResponse
-_client_target_response.restype = _buffer  # TTargetInfo
-func ClientTargetResponse(){
-    result = {}
+func ClientTargetResponse() <-chan m.TargetInfo {
+	p := n.NewClientTargetInfoPacket()
+
+	return p.Out
 }
-    data = _client_target_response()
-    if data:
-        fmt = '<I3Hb'
-        keys = 'ID', 'Tile', 'X', 'Y', 'Z'
-        values = _struct.unpack(fmt, data)
-        result.update(zip(keys, values))
-    return result
-func WaitForClientTargetResponse(MaxWaitTimeMS){
-    end = _time.time() + MaxWaitTimeMS / 1000
+
+func WaitForClientTargetResponse(maxWaitTime time.Duration) <-chan bool {
+	r := make(chan bool)
+	t := time.Now().Add(maxWaitTime)
+	go func() {
+		for {
+			time.Sleep(time.Millisecond * 1000)
+			if <-ClientTargetResponsePresent() {
+				r <- true
+				break
+			}
+
+			if time.Now().After(t) {
+				r <- false
+				break
+			}
+		}
+	}()
+
+	return r
 }
-    while _time.time() < end:
-        if ClientTargetResponsePresent():
-            return True
-        Wait(10)
-    return False
-*/
 
 func CheckLag(timeoutMS uint32) <-chan bool {
-	p := NewBoolPacket(299, timeoutMS)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(299, timeoutMS)
+
+	return p.Out
 }
 
-func GetQuestArrow() <-chan Point2D {
-	p := NewPoint2DPacket(SCGetQuestArrow)
-	p.send(senderFunc)
-	return p.out
+func GetQuestArrow() <-chan m.Point2D {
+	p := n.NewPoint2DPacket(c.SCGetQuestArrow)
+
+	return p.Out
 }
 
 func GetSilentMode() <-chan bool {
-	p := NewBoolPacket(302)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(302)
+
+	return p.Out
 }
 
 func ClearInfoWindow() {
-	p := NewVoidPacket(348)
-	p.send(senderFunc)
+	n.NewVoidPacket(348)
+
 }
 
 func SetSilentMode(value bool) {
-	p := NewVoidPacket(SCSetSilentMode, value)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCSetSilentMode, value)
+
 }
 
 func FillNewWindow(s string) {
-	p := NewVoidPacket(303, s)
-	p.send(senderFunc)
+	n.NewVoidPacket(303, s)
+
 }
 
 func StealthPath() <-chan string {
-	p := NewStringPacket(305)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(305)
+
+	return p.Out
 }
 
 func CurrentScriptPath() string {
@@ -2679,64 +2696,64 @@ func CurrentScriptPath() string {
 }
 
 func GetStealthProfilePath() <-chan string {
-	p := NewStringPacket(306)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(306)
+
+	return p.Out
 }
 
 func GetShardPath() <-chan string {
-	p := NewStringPacket(307)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(307)
+
+	return p.Out
 }
 
 func Step(direction byte, running bool) <-chan byte {
-	p := NewBytePacket(SCStep, direction, running)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBytePacket(c.SCStep, direction, running)
+
+	return p.Out
 }
 
 func StepQ(direction byte, running bool) <-chan int32 {
-	p := NewIntPacket(SCStepQ, direction, running)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewIntPacket(c.SCStepQ, direction, running)
+
+	return p.Out
 }
 
 func MoveXYZ(xdst, ydst uint16, zdst int8, optimized bool, accuracyXY, accurancyZ int32, running bool) <-chan bool {
-	p := NewBoolPacket(SCMoveXYZ, xdst, ydst, zdst, accuracyXY, accurancyZ, running)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(c.SCMoveXYZ, xdst, ydst, zdst, accuracyXY, accurancyZ, running)
+
+	return p.Out
 }
 
 func MoveXY(xdst, ydst uint16, optimized bool, accuracy int32, running bool) <-chan bool {
-	p := NewBoolPacket(SCMoveXY, xdst, ydst, optimized, accuracy, running)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(c.SCMoveXY, xdst, ydst, optimized, accuracy, running)
+
+	return p.Out
 }
 
 func SetBadLocation(x, y uint16) {
-	p := NewVoidPacket(SCSetBadLocation, x, y)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCSetBadLocation, x, y)
+
 }
 
 func SetGoodLocation(x, y uint16) {
-	p := NewVoidPacket(SCSetGoodLocation, x, y)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCSetGoodLocation, x, y)
+
 }
 
 func ClearBadLocationList() {
-	p := NewVoidPacket(330)
-	p.send(senderFunc)
+	n.NewVoidPacket(330)
+
 }
 
 func SetBadObject(otype, color uint16, radius byte) {
-	p := NewVoidPacket(SCSetBadObject, otype, color, radius)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCSetBadObject, otype, color, radius)
+
 }
 
 func ClearBadObjectList() {
-	p := NewVoidPacket(332)
-	p.send(senderFunc)
+	n.NewVoidPacket(332)
+
 }
 
 /*
@@ -2782,7 +2799,7 @@ func CheckLOS(xf, yf, zf, xt, yt, zt, WorldNum, LOSCheckType, LOSOptions=None){
                              '"PolLosThroughWindow" or None.')
         options |= _los_check_options[option]
     p :=
-p.send(senderFunc)
+
 // return _check_los(xf, yf, zf, xt, yt, zt, WorldNum, LOSCheckType, options)
 _get_path_array = _ScriptMethod(334)  # GetPathArray
 _get_path_array.restype = _buffer  # Array of TMyPoint
@@ -2858,58 +2875,58 @@ func CalcDir(Xfrom, Yfrom, Xto, Yto){
         return 1 if Yfrom > Yto else 3
 */
 func SetRunUnmountTimer(Value uint16) {
-	p := NewVoidPacket(316, Value)
-	p.send(senderFunc)
+	n.NewVoidPacket(316, Value)
+
 }
 
 func SetWalkMountTimer(Value uint16) {
-	p := NewVoidPacket(317, Value)
-	p.send(senderFunc)
+	n.NewVoidPacket(317, Value)
+
 }
 
 func SetRunMountTimer(Value uint16) {
-	p := NewVoidPacket(318, Value)
-	p.send(senderFunc)
+	n.NewVoidPacket(318, Value)
+
 }
 
 func SetWalkUnmountTimer(Value uint16) {
-	p := NewVoidPacket(319, Value)
-	p.send(senderFunc)
+	n.NewVoidPacket(319, Value)
+
 }
 
 func GetRunMountTimer() <-chan uint16 {
-	p := NewUint16Packet(320)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(320)
+
+	return p.Out
 }
 
 func GetWalkMountTimer() <-chan uint16 {
-	p := NewUint16Packet(321)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(321)
+
+	return p.Out
 }
 
 func GetRunUnmountTimer() <-chan uint16 {
-	p := NewUint16Packet(322)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(322)
+
+	return p.Out
 }
 
 func GetWalkUnmountTimer() <-chan uint16 {
-	p := NewUint16Packet(323)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(323)
+
+	return p.Out
 }
 
 func GetLastStepQUsedDoor() <-chan uint32 {
-	p := NewUint32Packet(344)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(344)
+
+	return p.Out
 }
 
 func StopMover() {
-	p := NewVoidPacket(353)
-	p.send(senderFunc)
+	n.NewVoidPacket(353)
+
 }
 
 func MoverStop() {
@@ -2932,29 +2949,29 @@ func UseItemOnMobile(ItemSerial, TargetSerial){
 }
 */
 func BandageSelf() {
-	p := NewVoidPacket(360)
-	p.send(senderFunc)
+	n.NewVoidPacket(360)
+
 }
 
 func GlobalChatJoinChannel(chName string) {
-	p := NewVoidPacket(361, chName)
-	p.send(senderFunc)
+	n.NewVoidPacket(361, chName)
+
 }
 
 func GlobalChatLeaveChannel() {
-	p := NewVoidPacket(362)
-	p.send(senderFunc)
+	n.NewVoidPacket(362)
+
 }
 
 func GlobalChatSendMsg(msgText string) {
-	p := NewVoidPacket(363, msgText)
-	p.send(senderFunc)
+	n.NewVoidPacket(363, msgText)
+
 }
 
 func GlobalChatActiveChannel() <-chan string {
-	p := NewStringPacket(364)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(364)
+
+	return p.Out
 }
 
 /*
@@ -2978,81 +2995,81 @@ func SetMoveOpenDoor(Value){
 }
 */
 func GetMoveOpenDoor() <-chan bool {
-	p := NewBoolPacket(401)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(401)
+
+	return p.Out
 }
 
 func SetMoveThroughNPC(Value uint16) {
-	p := NewVoidPacket(402, Value)
-	p.send(senderFunc)
+	n.NewVoidPacket(402, Value)
+
 }
 
 func GetMoveThroughNPC() <-chan uint16 {
-	p := NewUint16Packet(403)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(403)
+
+	return p.Out
 }
 
 func SetMoveThroughCorner(value bool) {
-	p := NewVoidPacket(SCGetMoveThroughCorner, value)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCGetMoveThroughCorner, value)
+
 }
 
 func GetMoveThroughCorner() <-chan bool {
-	p := NewBoolPacket(405)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(405)
+
+	return p.Out
 }
 
 func SetMoveHeuristicMult(value int32) {
-	p := NewVoidPacket(SCSetMoveHeuristicMult, value)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCSetMoveHeuristicMult, value)
+
 }
 
 func GetMoveHeuristicMult() <-chan uint32 {
-	p := NewUint32Packet(407)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(407)
+
+	return p.Out
 }
 
 func SetMoveCheckStamina(Value uint16) {
-	p := NewVoidPacket(408, Value)
-	p.send(senderFunc)
+	n.NewVoidPacket(408, Value)
+
 }
 
 func GetMoveCheckStamina() <-chan uint16 {
-	p := NewUint16Packet(409)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(409)
+
+	return p.Out
 }
 
 func SetMoveTurnCost(value uint32) {
-	p := NewVoidPacket(SCSetMoveTurnCost, value)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCSetMoveTurnCost, value)
+
 }
 
 func GetMoveTurnCost() <-chan uint32 {
-	p := NewUint32Packet(411)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint32Packet(411)
+
+	return p.Out
 }
 
 func SetMoveBetweenTwoCorners(value bool) {
-	p := NewVoidPacket(SCSetMoveBetweenTwoCorners, value)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCSetMoveBetweenTwoCorners, value)
+
 }
 
 func GetMoveBetweenTwoCorners() <-chan bool {
-	p := NewBoolPacket(413)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(413)
+
+	return p.Out
 }
 
-func GetMultis() <-chan []Multi {
-	p := NewGetMultisPacket()
-	p.send(senderFunc)
-	return p.out
+func GetMultis() <-chan []m.Multi {
+	p := n.NewGetMultisPacket()
+
+	return p.Out
 }
 
 /*
@@ -3073,7 +3090,7 @@ func GetMenuItemsEx(MenuCaption){
             template = 'Model: {0}, Color: {1}, Text: {2}'
 }
             p :=
-p.send(senderFunc)
+
 // return '{ ' + template.format(hex(self.model), hex(self.color),
                                           self.text) + ' }'        func __repr__(self){
             return self.__str__()
@@ -3092,63 +3109,63 @@ p.send(senderFunc)
         result.append(item)    return result
 */
 func CloseClientGump(iD uint32) {
-	p := NewVoidPacket(342, iD)
-	p.send(senderFunc)
+	n.NewVoidPacket(342, iD)
+
 }
 
 func GetNextStepZ(currX, currY, destX, destY uint16, worldNum byte, currZ int8) <-chan int8 {
-	p := NewInt8Packet(SCGetNextStepZ, currX, currY, destX, destY, worldNum, currZ)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewInt8Packet(c.SCGetNextStepZ, currX, currY, destX, destY, worldNum, currZ)
+
+	return p.Out
 }
 
 func ClientHide(ID uint32) <-chan bool {
-	p := NewBoolPacket(368, ID)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBoolPacket(368, ID)
+
+	return p.Out
 }
 
 func GetSkillLockState(skillName string) <-chan int8 {
-	p := NewInt8Packet(SCGetSkillLockState, skillName)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewInt8Packet(c.SCGetSkillLockState, skillName)
+
+	return p.Out
 }
 
 func GetStatLockState(skillName string) <-chan byte {
-	p := NewBytePacket(SCGetStatLockState)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewBytePacket(c.SCGetStatLockState)
+
+	return p.Out
 }
 
 func EquipLastWeapon() {
-	p := NewVoidPacket(SCEquipLastWeapon)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCEquipLastWeapon)
+
 }
 
 func BookGetPageText(page uint16) <-chan string {
-	p := NewStringPacket(SCBookGetPageText, page)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(c.SCBookGetPageText, page)
+
+	return p.Out
 }
 
 func BookSetText(text string) {
-	p := NewVoidPacket(SCBookSetText, text)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCBookSetText, text)
+
 }
 
 func BookSetPageText(page uint16, text string) {
-	p := NewVoidPacket(SCBookSetText, page, text)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCBookSetText, page, text)
+
 }
 
 func BookClearText() {
-	p := NewVoidPacket(SCBookClearText)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCBookClearText)
+
 }
 
 func BookSetHeader(title, author string) {
-	p := NewVoidPacket(SCBookSetHeader, title, author)
-	p.send(senderFunc)
+	n.NewVoidPacket(c.SCBookSetHeader, title, author)
+
 }
 
 /*
@@ -3216,48 +3233,47 @@ def CreateChar(
 */
 //# Script control functions
 func GetScriptCount() <-chan uint16 {
-	p := NewUint16Packet(SCGetScriptsCount)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(c.SCGetScriptsCount)
+
+	return p.Out
 }
 
 func GetScriptPath(scriptIndex uint16) <-chan string {
-	p := NewStringPacket(SCGetScriptPath, scriptIndex)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(c.SCGetScriptPath, scriptIndex)
+
+	return p.Out
 }
 
 func GetScriptName(ScriptIndex uint16) <-chan string {
-	p := NewStringPacket(SCGetScriptName, ScriptIndex)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewStringPacket(c.SCGetScriptName, ScriptIndex)
+
+	return p.Out
 }
 
 func GetScriptState(scriptIndex uint16) <-chan int8 {
-	p := NewInt8Packet(SCGetScriptState, scriptIndex)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewInt8Packet(c.SCGetScriptState, scriptIndex)
+
+	return p.Out
 
 }
 
 func StartScript(scriptPath string) <-chan uint16 {
-	p := NewUint16Packet(SCStartScript, scriptPath)
-	p.send(senderFunc)
-	return p.out
+	p := n.NewUint16Packet(c.SCStartScript, scriptPath)
+
+	return p.Out
 }
 
 func StopScript(scriptIndex uint16) {
-	p := NewVoidPacket(456)
-	p.send(senderFunc)
+	n.NewVoidPacket(456)
+
 }
 
 func PauseResumeScript(scriptIndex uint16) {
-	p := NewVoidPacket(456)
-	p.send(senderFunc)
+	n.NewVoidPacket(456)
+
 }
 
 func StopAllScripts() {
-	p := NewVoidPacket(457)
-	p.send(senderFunc)
+	n.NewVoidPacket(457)
 
 }

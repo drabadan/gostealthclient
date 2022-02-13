@@ -1,20 +1,18 @@
-package composer
+package network
 
 import (
 	"encoding/binary"
-
-	"github.com/drabadan/gostealthclient/internal/encoder"
 )
 
 var increment uint16 = 0
 
 type Composer struct {
-	encoder *encoder.Encoder
+	encoder *Encoder
 	db      []byte
 	bs      []byte
 }
 
-func NewComposer(e *encoder.Encoder) *Composer {
+func NewComposer(e *Encoder) *Composer {
 	return &Composer{
 		encoder: e,
 		db:      make([]byte, 0),

@@ -5,12 +5,12 @@ import (
 
 	"github.com/drabadan/gostealthclient/config"
 	"github.com/drabadan/gostealthclient/internal/connection"
+	"github.com/drabadan/gostealthclient/internal/network"
 )
 
-var senderFunc func(spd *scPacketData)
-var receiverFunc func(s uint16, rtype byte) []byte
-var packetLog = make([]*scPacketData, 0)
-var responsesLog = make([][]byte, 0)
+var packetLog = make([]network.ScPacketData, 0)
+
+type Middleware = func(readBuff []byte) []byte
 
 func Bootstrap(script func() interface{}) interface{} {
 	cfg := config.NewConfig(0)
@@ -22,8 +22,9 @@ func Bootstrap(script func() interface{}) interface{} {
 	}
 
 	defer conn.Close()
-	senderFunc = sender(conn)
-	mws := make([]func(readBuff []byte) []byte, 0)
-	receiverFunc = defaultReceiver(conn, &mws)
+
+	network.NewSender(conn, &packetLog)
+	mws := make([]Middleware, 0)
+	network.NewReciever(conn, &mws, config.DEBUG)
 	return script()
 }

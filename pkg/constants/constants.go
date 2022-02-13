@@ -1,10 +1,4 @@
-package gostealthclient
-
-var (
-	debug = true
-)
-
-const READ_DELAY = 0 // time.Microsecond * 50
+package constants
 
 const (
 	SCZero                             = 0
@@ -410,7 +404,7 @@ const (
 	SCClearFigures = 553
 )
 
-var _SPELLS = map[string]int32{
+var SPELLS = map[string]int32{
 	// # 1st circle
 	"clumsy":         1,
 	"create food":    2,
@@ -655,7 +649,7 @@ var _SPELLS = map[string]int32{
 	"combat training": 744,
 }
 
-var _VIRTUES = map[string]uint32{
+var VIRTUES = map[string]uint32{
 	"compassion":   0x69,
 	"honesty":      0x6A,
 	"honor":        0x6B,

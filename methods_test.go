@@ -7,6 +7,7 @@ import (
 	"time"
 
 	sc "github.com/drabadan/gostealthclient"
+	m "github.com/drabadan/gostealthclient/pkg/model"
 )
 
 func TestInjournalBetweenTimes(t *testing.T) {
@@ -114,7 +115,7 @@ func TestReadStaticXY(t *testing.T) {
 		return <-sc.ReadStaticsXY(<-sc.GetX(<-sc.Self()), <-sc.GetY(<-sc.Self()), <-sc.WorldNum())
 	}
 	ans := sc.Bootstrap(s)
-	res, ok := ans.([]sc.StaticsXY)
+	res, ok := ans.([]m.StaticsXY)
 	if !ok || len(res) == 0 {
 		t.Errorf("Failed to read statics")
 	}
@@ -135,7 +136,7 @@ func TestIsWorldCellPassablePacket(t *testing.T) {
 	}
 
 	ans := sc.Bootstrap(s)
-	res, ok := ans.(sc.WorldCellPassable)
+	res, ok := ans.(m.WorldCellPassable)
 
 	if !ok || res.Passable || res.Z != 0 {
 		t.Errorf("Failed to resolve TestIsWorldCellPassablePacket %v res.", res)
@@ -163,7 +164,7 @@ func TestBuffBarInfo(t *testing.T) {
 	}
 
 	ans := sc.Bootstrap(s)
-	res, ok := ans.(sc.BuffBarInfo)
+	res, ok := ans.(m.BuffBarInfo)
 	if !ok || res.Count < 1 {
 		t.Errorf("Failed to get buffbar, or char didn't cast Agility. Res: %v", res)
 	}
@@ -174,7 +175,7 @@ func TestExtInfo(t *testing.T) {
 		return <-sc.GetExtInfo()
 	}
 	ans := sc.Bootstrap(s)
-	res, ok := ans.(sc.ExtendedInfo)
+	res, ok := ans.(m.ExtendedInfo)
 
 	if !ok || res.MaxWeight == 0 {
 		t.Errorf("Failed to resolve Ext info. %v", res)
@@ -209,5 +210,58 @@ func TestConnection(t *testing.T) {
 		sc.Bootstrap(s)
 		log.Println("=================")
 		time.Sleep(time.Second * 2)
+	}
+}
+
+// Failing to read properly value has x00/ in the beginning
+func TestSetGetGlobalVar(t *testing.T) {
+	s := func() interface{} {
+		sc.SetGlobal(0, "testVar", "testValue")
+		return <-sc.GetGlobal(0, "testVar")
+	}
+
+	ans := sc.Bootstrap(s)
+	res, ok := ans.(string)
+
+	if !ok || res != "testValue" {
+		t.Errorf("Failed to set or get global var. Received: %v", res)
+	}
+
+}
+
+func TestGetMapCell(t *testing.T) {
+	type response struct {
+		zOrig int8
+		mCell m.MapCell
+	}
+
+	s := func() interface{} {
+		return response{
+			zOrig: <-sc.GetZ(<-sc.Self()),
+			mCell: <-sc.GetCell(<-sc.GetX(<-sc.Self()), <-sc.GetY(<-sc.Self()), <-sc.WorldNum()),
+		}
+	}
+
+	ans := sc.Bootstrap(s)
+	res, ok := ans.(response)
+
+	if !ok || res.zOrig != res.mCell.Z {
+		t.Errorf("Failed to set or get global var. Received: %v", res)
+	}
+}
+
+func TestClientTargetResponse(t *testing.T) {
+	s := func() interface{} {
+		sc.ClientRequestObjectTarget()
+		// sc.ClientRequestTileTarget()
+		<-sc.WaitForClientTargetResponse(time.Second * 10)
+		return <-sc.ClientTargetResponse()
+	}
+
+	ans := sc.Bootstrap(s)
+	res, ok := ans.(m.TargetInfo)
+
+	if !ok {
+		t.Errorf("Failed to set or get global var. Received: %v", res)
 	}
 }

@@ -1,4 +1,4 @@
-package gostealthclient
+package model
 
 import "time"
 
@@ -81,4 +81,27 @@ type ExtendedInfo struct {
 	MaxHpIncr          uint16 `bin:"len:4"`
 	MaxStamIncr        uint16 `bin:"len:4"`
 	MaxManaIncrease    uint16 `bin:"len:4"`
+}
+
+// Represents X or Y coordinate in UO world
+type Coordinate uint16
+
+type MapCell struct {
+	Tile uint16 `bin:"le"`
+	Z    int8   `bin:"le"`
+}
+
+type FoundTile struct {
+	Tile uint16     `bin:"le"`
+	X    Coordinate `bin:"le"`
+	Y    Coordinate `bin:"le"`
+	Z    int8       `bin:"le"`
+}
+
+type TargetInfo struct {
+	ID   uint32     `bin:"le"`
+	Tile uint16     `bin:"le"`
+	X    Coordinate `bin:"le"`
+	Y    Coordinate `bin:"le"`
+	Z    int8       `bin:"le"`
 }

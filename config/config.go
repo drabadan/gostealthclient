@@ -11,6 +11,8 @@ const (
 	SOCKET_MAX_RETRIES = 10
 	SOCKET_HOST        = "localhost"
 	SOCKET_PORT        = 47602
+
+	DEBUG = false
 )
 
 type Config struct {

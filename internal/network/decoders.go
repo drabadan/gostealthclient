@@ -1,12 +1,14 @@
-package gostealthclient
+package network
 
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"math"
 	"strings"
+	"time"
 
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
@@ -33,4 +35,20 @@ func DecodeUtf16(inputBytes []byte) string {
 	}
 
 	return strings.Replace(string(decoded), "\r\n", "\n", -1)
+}
+
+func DecodeDelphiTime(double float64) time.Time {
+	f := double
+	t := time.Date(1899, 12, 30, 00, 00, 00, 00, time.Local)
+
+	d, _ := math.Modf(f)
+
+	ds := fmt.Sprintf("%vh", (int32(d) * 24))
+	dd, _ := time.ParseDuration(ds)
+	hs := fmt.Sprintf("%vh", (24 * (f - d)))
+	hh, _ := time.ParseDuration(hs)
+
+	t = t.Add(dd).Add(hh)
+
+	return t
 }

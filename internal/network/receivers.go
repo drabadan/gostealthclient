@@ -1,4 +1,4 @@
-package gostealthclient
+package network
 
 import (
 	"encoding/binary"
@@ -12,25 +12,46 @@ import (
 const (
 	SIZE_READ_TYPE = 0
 	BODY_READ_TYPE = 1
+	READ_DELAY     = 0 // time.Microsecond * 50
 )
 
-func defaultReceiver(conn *net.TCPConn, mws *[]func(readBuff []byte) []byte) func(s uint16, rtype byte) []byte {
+var receiver *Receiver
+var receiverFunc func(s uint16, rtype byte) []byte
+
+type Receiver struct {
+	conn  *net.TCPConn
+	mws   *[]func(readBuff []byte) []byte
+	debug bool
+}
+
+func NewReciever(conn *net.TCPConn, mws *[]func(readBuff []byte) []byte, debug bool) {
+	receiver = &Receiver{
+		conn,
+		mws,
+		debug,
+	}
+
+	receiverFunc = receiver.receive()
+}
+
+func (r *Receiver) receive() func(s uint16, rtype byte) []byte {
 	paused := false
 	var lpb []byte
+
 	return func(s uint16, rtype byte) []byte {
 		readBuff := make([]byte, s)
-		_, err := conn.Read(readBuff)
+		_, err := r.conn.Read(readBuff)
 
 		if err != nil {
 			log.Fatal("Received err from tcp connection. Shutting down...")
 		}
 
 		if rtype == BODY_READ_TYPE {
-			if debug {
+			if r.debug {
 				log.Printf("Received body: % x", readBuff)
 			}
 
-			responsesLog = append(responsesLog, readBuff)
+			// responsesLog = append(responsesLog, readBuff)
 			t := binary.LittleEndian.Uint16(readBuff[0:2])
 			switch t {
 			case 1:
