@@ -12,6 +12,8 @@ var packetLog = make([]network.ScPacketData, 0)
 
 type Middleware = func(readBuff []byte) []byte
 
+// Main method for script setup
+// Accepts as argument func with script
 func Bootstrap(script func() interface{}) interface{} {
 	cfg := config.NewConfig(0)
 	cm := connection.NewConnectionManager(*cfg)
