@@ -265,3 +265,21 @@ func TestClientTargetResponse(t *testing.T) {
 		t.Errorf("Failed to set or get global var. Received: %v", res)
 	}
 }
+
+func Test_StaticTilesArray(t *testing.T) {
+	s := func() interface{} {
+		s := <-sc.Self()
+		x := <-sc.GetX(s)
+		y := <-sc.GetY(s)
+
+		tt := []uint16{0xFFFF}
+		return <-sc.GetStaticTilesArray(x-2, y-2, x+2, y+2, <-sc.WorldNum(), tt)
+	}
+
+	ans := sc.Bootstrap(s)
+	res, ok := ans.([]m.FoundTile)
+
+	if !ok {
+		t.Errorf("Failed to set or get global var. Received: %v", res)
+	}
+}
