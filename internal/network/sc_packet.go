@@ -533,15 +533,14 @@ func (p *scGetStaticTilesArrayPacket) transform() {
 	count := int(binary.LittleEndian.Uint16(b[4:8]))
 	r := make([]model.FoundTile, 0)
 
-	ssize := 14
+	size := 14
 
 	wb := b[8:]
 
-	var size int
 	for i := 0; i < count; i++ {
 		var f model.FoundTile
 		offset := i * size
-		err := binstruct.UnmarshalLE(wb[offset:offset+ssize], &f)
+		err := binstruct.UnmarshalLE(wb[offset:offset+size], &f)
 		if err != nil {
 			log.Fatalf("Failed to parse FoundTile info! Exiting...")
 		}
