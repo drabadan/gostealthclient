@@ -272,8 +272,11 @@ func Test_StaticTilesArray(t *testing.T) {
 		x := <-sc.GetX(s)
 		y := <-sc.GetY(s)
 
-		tt := []uint16{0xFFFF}
-		return <-sc.GetStaticTilesArray(x-2, y-2, x+2, y+2, <-sc.WorldNum(), tt)
+		tt := make([]uint16, 0)
+		for i := 1339; i <= 1359; i++ {
+			tt = append(tt, uint16(i))
+		}
+		return <-sc.GetStaticTilesArray(x-1, y, x, y, <-sc.WorldNum(), tt)
 	}
 
 	ans := sc.Bootstrap(s)

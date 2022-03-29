@@ -533,7 +533,7 @@ func (p *scGetStaticTilesArrayPacket) transform() {
 	count := int(binary.LittleEndian.Uint16(b[4:8]))
 	r := make([]model.FoundTile, 0)
 
-	size := 14
+	size := 7
 
 	wb := b[8:]
 
