@@ -3,6 +3,8 @@ package network
 import (
 	"log"
 	"net"
+
+	"github.com/drabadan/gostealthclient/config"
 )
 
 var instance *Sender
@@ -30,6 +32,9 @@ func GetInstance() *Sender {
 // Default sender func that writes to connection
 func (s *Sender) Send(spd *ScPacketData) {
 	*s.pl = append(*s.pl, *spd)
+	if config.DEBUG {
+		log.Printf("Send packet: % x", spd.bytesToSend)
+	}
 	_, err := s.conn.Write(spd.bytesToSend)
 	if err != nil {
 		log.Fatal(err)

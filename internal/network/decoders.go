@@ -39,7 +39,7 @@ func DecodeUtf16(inputBytes []byte) string {
 
 func DecodeDelphiTime(double float64) time.Time {
 	f := double
-	t := time.Date(1899, 12, 30, 00, 00, 00, 00, time.Local)
+	t := time.Date(1899, 12, 30, 00, 00, 00, 00, time.UTC)
 
 	d, _ := math.Modf(f)
 

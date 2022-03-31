@@ -82,8 +82,11 @@ func (e *Encoder) encodeBool(data bool, dataBytes *[]byte) {
 
 func (e *Encoder) encodeTime(data time.Time, dataBytes *[]byte) {
 	buf := new(bytes.Buffer)
-	t := time.Date(1899, 12, 30, 00, 00, 00, 00, time.Local)
-	delta := data.Sub(t)
+	t := time.Date(1899, 12, 30, 00, 00, 00, 00, time.UTC)
+
+	_, o := time.Now().Zone()
+	delta := data.Add(time.Second * time.Duration(o)).Sub(t)
+
 	r := float64(delta.Microseconds()) / 1000000 / 60 / 60 / 24
 	e.writeBuf(buf, "encodeTime", r)
 	*dataBytes = append(*dataBytes, buf.Bytes()...)

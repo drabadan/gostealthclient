@@ -24,7 +24,7 @@ func TestInjournalBetweenTimes(t *testing.T) {
 		}
 	})
 
-	const str = "test"
+	const str = "test1"
 	t.Run("Should return >= 0 if string is found", func(t *testing.T) {
 		s := func() interface{} {
 			tb := time.Now()
@@ -165,6 +165,11 @@ func TestBuffBarInfo(t *testing.T) {
 
 	ans := sc.Bootstrap(s)
 	res, ok := ans.(m.BuffBarInfo)
+
+	for _, b := range res.Buffs {
+		log.Printf("%v", b.TimeStart)
+	}
+
 	if !ok || res.Count < 1 {
 		t.Errorf("Failed to get buffbar, or char didn't cast Agility. Res: %v", res)
 	}
@@ -284,5 +289,20 @@ func Test_StaticTilesArray(t *testing.T) {
 
 	if !ok {
 		t.Errorf("Failed to set or get global var. Received: %v", res)
+	}
+}
+
+func Test_ConnectedTime(t *testing.T) {
+	s := func() interface{} {
+		return <-sc.ConnectedTime()
+	}
+
+	ans := sc.Bootstrap(s)
+	res, ok := ans.(time.Time)
+
+	log.Printf("%v", res)
+
+	if !ok || res.Before(time.Now()) {
+		t.Errorf("Failed to get buffbar, or char didn't cast Agility. Res: %v", res)
 	}
 }

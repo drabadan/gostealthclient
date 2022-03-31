@@ -211,7 +211,7 @@ func receiveFloat(r chan float64) {
 
 func readTimeResponse() time.Time {
 	f := readFloatResponse()
-	t := time.Date(1899, 12, 30, 00, 00, 00, 00, time.Local)
+	t := time.Date(1899, 12, 30, 00, 00, 00, 00, time.UTC)
 
 	d, _ := math.Modf(f)
 
