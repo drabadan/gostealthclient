@@ -52,6 +52,12 @@ func (r *Receiver) receive() func(s uint16, rtype byte) []byte {
 			}
 
 			// responsesLog = append(responsesLog, readBuff)
+
+			if len(readBuff) < 2 {
+				log.Printf("Size of readbuff < 2: % x", readBuff)
+				return readBuff
+			}
+
 			t := binary.LittleEndian.Uint16(readBuff[0:2])
 			switch t {
 			case 1:
