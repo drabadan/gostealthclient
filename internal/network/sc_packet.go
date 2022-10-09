@@ -573,7 +573,7 @@ func (p *scClientTargetInfoPacket) transform() {
 
 	var r model.TargetInfo
 
-	err := binstruct.UnmarshalLE(b, &r)
+	err := binstruct.UnmarshalLE(b[4:], &r)
 	if err != nil {
 		log.Fatalf("Failed to parse TargetInfo info! Exiting...")
 	}

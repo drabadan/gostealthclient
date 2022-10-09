@@ -99,9 +99,9 @@ type FoundTile struct {
 }
 
 type TargetInfo struct {
-	ID   uint32     `bin:"le"`
-	Tile uint16     `bin:"le"`
-	X    Coordinate `bin:"le"`
-	Y    Coordinate `bin:"le"`
-	Z    int8       `bin:"le"`
+	ID   uint32     `bin:"len:8"`
+	Tile uint16     `bin:"len:4"`
+	X    Coordinate `bin:"len:4"`
+	Y    Coordinate `bin:"len:4"`
+	Z    int8       `bin:"len:2"`
 }

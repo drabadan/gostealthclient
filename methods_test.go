@@ -306,3 +306,19 @@ func Test_ConnectedTime(t *testing.T) {
 		t.Errorf("Failed to get buffbar, or char didn't cast Agility. Res: %v", res)
 	}
 }
+
+func Test_ClientTargetResponse(t *testing.T) {
+	s := func() interface{} {
+		sc.ClientRequestObjectTarget()
+		<-sc.WaitForClientTargetResponse(time.Duration(30 * time.Second))
+		sc.WaitTargetSelf()
+		return <-sc.ClientTargetResponse()
+	}
+
+	ans := sc.Bootstrap(s)
+	res, ok := ans.(m.TargetInfo)
+
+	if !ok || res.ID != <-sc.Self() {
+		t.Errorf("Failed to parse TargetInfo response from Stealth")
+	}
+}
