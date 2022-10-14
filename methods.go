@@ -1642,11 +1642,14 @@ func equip(Layer, Obj){
     p :=
 return Equip(Layer, Obj)
 }
+
 func Equipt(Layer, ObjType){
     item = FindType(ObjType, Backpack())
 }
     if item:
         p :=
+
+
 return Equip(Layer, item)return False
 func equipt(Layer, ObjType){
     p :=
@@ -2605,10 +2608,11 @@ func GlobalChatChannelsList(){
         result.append(string.value)return result
 _set_open_doors = _ScriptMethod(400)  # SetMoveOpenDoor
 _set_open_doors.argtypes = [_bool]  # Value
-func SetMoveOpenDoor(Value){
-    _set_open_doors(Value)
-}
 */
+func SetMoveOpenDoor(v bool) {
+	n.NewVoidPacket(c.SCSetMoveOpenDoor, v)
+}
+
 func GetMoveOpenDoor() <-chan bool {
 	p := n.NewBoolPacket(401)
 	return p.Out
