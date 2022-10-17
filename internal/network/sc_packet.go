@@ -591,3 +591,29 @@ func NewClientTargetInfoPacket() *scClientTargetInfoPacket {
 	go p.transform()
 	return p
 }
+
+//GumpInfo
+type scGetGumpInfoPacket struct {
+	scCompositePacketData
+	Out chan model.Gump
+}
+
+func (p *scGetGumpInfoPacket) transform() {
+	defer close(p.Out)
+	b := <-p.rb
+	var c model.Gump
+	err := binstruct.UnmarshalLE(b[4:], &c)
+	if err != nil {
+		log.Fatalf("Failed to parse GumpInfo! Exiting...")
+	}
+	p.Out <- c
+}
+func NewGetGumpInfoPacket(args ...interface{}) *scGetGumpInfoPacket {
+	p := &scGetGumpInfoPacket{}
+	p.setSendBytes(constants.SCGetGumpInfo, args...)
+	p.rb = make(chan []byte)
+	p.Out = make(chan model.Gump)
+	go receiveByteArray(p.rb)
+	go p.transform()
+	return p
+}

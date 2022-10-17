@@ -1441,6 +1441,13 @@ class _Gump:
     args = [_uint, _uint, _short, _short, _int] + [_bool] * 4
     keys = ('Serial', 'GumpID', 'X', 'Y', 'Pages', 'NoMove', 'NoResize',
             'NoDispose', 'NoClose')
+*/
+func GetGumpInfo(gi uint16) chan m.Gump {
+	p := n.NewGetGumpInfoPacket(gi)
+	return p.Out
+}
+
+/*
 func GetGumpInfo(GumpIndex){
     data = _get_gump_info(GumpIndex)
 }

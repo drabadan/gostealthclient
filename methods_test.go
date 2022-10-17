@@ -308,17 +308,32 @@ func Test_ConnectedTime(t *testing.T) {
 }
 
 func Test_ClientTargetResponse(t *testing.T) {
+	var self uint32
 	s := func() interface{} {
+		self = <-sc.Self()
 		sc.ClientRequestObjectTarget()
 		<-sc.WaitForClientTargetResponse(time.Duration(30 * time.Second))
-		sc.WaitTargetSelf()
 		return <-sc.ClientTargetResponse()
 	}
 
 	ans := sc.Bootstrap(s)
 	res, ok := ans.(m.TargetInfo)
 
-	if !ok || res.ID != <-sc.Self() {
+	if !ok || res.ID != self {
 		t.Errorf("Failed to parse TargetInfo response from Stealth")
+	}
+}
+
+func Test_GetGumpInfo(t *testing.T) {
+	s := func() interface{} {
+		// return <-sc.GetGumpID(0)
+		return <-sc.GetGumpInfo(0)
+	}
+
+	ans := sc.Bootstrap(s)
+	res, ok := ans.(m.Gump)
+
+	if !ok || res.GumpId == 0 {
+		t.Errorf("Failed to parse GumpInfo response from Stealth")
 	}
 }
